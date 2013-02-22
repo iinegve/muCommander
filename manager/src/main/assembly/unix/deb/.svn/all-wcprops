@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/mucommander/!svn/ver/3639/trunk/res/package/unix/deb
+END
+control
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/mucommander/!svn/ver/3639/trunk/res/package/unix/deb/control
+END
+postinst
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/mucommander/!svn/ver/3639/trunk/res/package/unix/deb/postinst
+END
+postrm
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/mucommander/!svn/ver/3639/trunk/res/package/unix/deb/postrm
+END

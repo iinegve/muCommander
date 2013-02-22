@@ -1,0 +1,134 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.mucommander</groupId>
+        <artifactId>mucommander-mvn</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.mucommander.commons</groupId>
+    <artifactId>file</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <properties>
+        <!-- All resources and files use UTF-8 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <hadoop.version>2.0.0-mr1-cdh4.1.2</hadoop.version>
+        <!--<hadoop.version>2.0.0</hadoop.version>-->
+        <hadoop.common.version>2.0.0-cdh4.1.2</hadoop.common.version>
+        <!--<hadoop.common.version>2.0.0</hadoop.common.version>-->
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <!-- Check again if it is required for HBase -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+        </dependency>
+
+        <!-- Hadoop -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-core</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-auth</artifactId>
+            <version>${hadoop.common.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${hadoop.common.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${hadoop.common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mucommander.commons</groupId>
+            <artifactId>io</artifactId>
+            <version>1.0.0-b14</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mucommander.commons</groupId>
+            <artifactId>utils</artifactId>
+            <version>1.0.0-b14</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mucommander.commons</groupId>
+            <artifactId>runtime</artifactId>
+            <version>1.0.0-b14</version>
+        </dependency>
+        <dependency>
+            <groupId>jcifs</groupId>
+            <artifactId>jcifs</artifactId>
+            <version>1.0.0b</version>
+        </dependency>
+        <dependency>
+            <groupId>jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>1.0.0b</version>
+        </dependency>
+        <dependency>
+            <groupId>j2ssh</groupId>
+            <artifactId>j2ssh</artifactId>
+            <version>1.0.0b</version>
+        </dependency>
+        <dependency>
+            <groupId>yanfs</groupId>
+            <artifactId>yanfs</artifactId>
+            <version>1.0.0b</version>
+        </dependency>
+        <dependency>
+            <groupId>junrar</groupId>
+            <artifactId>junrar</artifactId>
+            <version>1.0.0b</version>
+            <!-- https://junrar-repository.googlecode.com/svn/deploy/ -->
+        </dependency>
+        <dependency>
+            <groupId>bzip2</groupId>
+            <artifactId>bzip2</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.13</version>
+
+                <configuration>
+                    <!--
+                        Too much complexity for now.
+                        At least for HDFS it is required to get up and running HDFS to run test against it.
+                        I'm afraid all other stuff like S3, FTP, etc require the same.
+                    -->
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
