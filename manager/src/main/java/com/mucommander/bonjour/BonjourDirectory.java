@@ -18,22 +18,20 @@
 
 package com.mucommander.bonjour;
 
-import java.io.IOException;
-import java.net.Inet6Address;
-import java.net.MalformedURLException;
-import java.util.List;
-import java.util.Vector;
+import com.mucommander.commons.file.FileProtocols;
+import com.mucommander.commons.file.FileURL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.mucommander.commons.file.FileProtocols;
-import com.mucommander.commons.file.FileURL;
+import java.io.IOException;
+import java.net.Inet6Address;
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Collects and maintains a list of available Bonjour/Zeroconf services using the JmDNS library.
@@ -84,7 +82,7 @@ public class BonjourDirectory implements ServiceListener {
         if(enabled && jmDNS==null) {
             // Start JmDNS
             try {
-                jmDNS = JmDNS.create();
+                jmDNS = new JmDNS();
 
                 // Listens to service events for known service types
                 int nbServices = KNOWN_SERVICE_TYPES.length;

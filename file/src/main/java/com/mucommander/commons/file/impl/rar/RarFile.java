@@ -17,19 +17,17 @@
  */
 package com.mucommander.commons.file.impl.rar;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-
+import com.github.junrar.Archive;
+import com.github.junrar.exception.RarException;
+import com.github.junrar.rarfile.FileHeader;
 import com.mucommander.commons.file.AbstractFile;
 import com.mucommander.commons.file.UnsupportedFileOperationException;
 import com.mucommander.commons.util.CircularByteBuffer;
 
-import de.innosystec.unrar.Archive;
-import de.innosystec.unrar.exception.RarException;
-import de.innosystec.unrar.exception.RarException.RarExceptionType;
-import de.innosystec.unrar.rarfile.FileHeader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 
 /**
  * 
@@ -70,7 +68,7 @@ public class RarFile {
     	// If the file that is going to be extracted is divided and continued in another archive 
         // part - don't extract it and throw corresponding exception to raise an error. 
         if (header.isSplitAfter())
-    		throw new RarException(RarExceptionType.notImplementedYet);
+    		throw new RarException(RarException.RarExceptionType.notImplementedYet);
     	
         final CircularByteBuffer cbb = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
         
@@ -80,7 +78,7 @@ public class RarFile {
     		    	try {
 						archive.extractFile(header, cbb.getOutputStream());
 					} catch (RarException e) {
-						if (e.getType() != RarExceptionType.crcError)
+						if (e.getType() != RarException.RarExceptionType.crcError)
 							e.printStackTrace();
 					}
     		    	finally {

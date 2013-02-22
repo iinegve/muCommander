@@ -10,23 +10,19 @@
     <packaging>pom</packaging>
 
     <properties>
-        <!-- All resources and files use UTF-8 -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
         <java.version>1.6</java.version>
 
         <hadoop.version>2.0.0-mr1-cdh4.1.1</hadoop.version>
         <hadoop.common.version>2.0.0-cdh4.1.1</hadoop.common.version>
         <guava.version>11.0.2</guava.version>
-
-        <org.mockito.version>1.8.5</org.mockito.version>
-        <org.junit.version>4.8.1</org.junit.version>
-
         <protobuf.version>2.4.1</protobuf.version>
     </properties>
 
     <repositories>
+        <repository>
+            <id>Central</id>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
         <repository>
             <id>java.net-Public</id>
             <url>https://maven.java.net/content/groups/public/</url>
@@ -51,6 +47,10 @@
             <id>cloudera</id>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
         </repository>
+        <repository>
+            <id>jboss 3party releases</id>
+            <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
+        </repository>
     </repositories>
 
     <modules>
@@ -66,45 +66,48 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <!-- Dirty hack: there is no place to download it from -->
+                <groupId>yanfs</groupId>
+                <artifactId>yanfs</artifactId>
+                <version>1.2</version>
+                <scope>system</scope>
+                <systemPath>${project.basedir}/assembly/lib/yanfs-1.2.jar</systemPath>
+            </dependency>
+
+            <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
                 <version>4.8.1.1</version>
             </dependency>
             <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>5.12.1</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>jcifs</groupId>
                 <artifactId>jcifs</artifactId>
-                <version>1.0.0b</version>
+                <version>1.3.17</version>
             </dependency>
             <dependency>
-                <groupId>jna</groupId>
+                <groupId>com.sun.jna</groupId>
                 <artifactId>jna</artifactId>
-                <version>1.0.0b</version>
+                <version>3.0.9</version>
             </dependency>
             <dependency>
-                <groupId>j2ssh</groupId>
-                <artifactId>j2ssh</artifactId>
-                <version>1.0.0b</version>
+                <groupId>sshtools</groupId>
+                <artifactId>j2ssh-core</artifactId>
+                <version>0.2.9</version>
             </dependency>
             <dependency>
-                <groupId>yanfs</groupId>
-                <artifactId>yanfs</artifactId>
-                <version>1.0.0b</version>
-            </dependency>
-            <dependency>
-                <groupId>junrar</groupId>
+                <groupId>com.github.junrar</groupId>
                 <artifactId>junrar</artifactId>
-                <version>1.0.0b</version>
+                <version>0.7</version>
             </dependency>
             <dependency>
                 <groupId>bzip2</groupId>
                 <artifactId>bzip2</artifactId>
                 <version>1.7.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jmdns</groupId>
+                <artifactId>jmdns</artifactId>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -126,14 +129,24 @@
                 <artifactId>jul-to-slf4j</artifactId>
                 <version>1.6.4</version>
             </dependency>
-
-
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.16</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.8.5</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>5.12.1</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
