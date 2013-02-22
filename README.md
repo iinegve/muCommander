@@ -1,4 +1,0 @@
-muCommander
-===========
-
-muCommander fork
