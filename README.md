@@ -1,10 +1,22 @@
 muCommander
 ===========
 
-muCommander fork of version 0.9.0. Initially it lives at www.mucommander.com, 
-but for a while those guys stop updated it.
+www.mucommander.com fork of v0.9.0
 
-Current fork contains also sources of required libraries (collections, conf, etc).
+Current repository contains also sources of all required libraries:
+* collections
+* conf
+* file
+* io
+* runtime
+* util
 
-Important thing is the file module has been updated to support new version of HDFS - 
-currently 2.0.0 - but probably it will work with newer ones. 
+Key difference from v0.9.0:
+* supports HDFS 2.0.0
+
+
+===========
+Sources could be built right after git clone.
+To get runnable version the one must
+* run mvn clean install
+* in ./manager/target directory run manager-{version}.jar (it uses target/lib folder)
