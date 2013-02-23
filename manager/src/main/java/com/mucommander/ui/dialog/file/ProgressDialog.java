@@ -18,36 +18,6 @@
 
 package com.mucommander.ui.dialog.file;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.WindowEvent;
-import java.util.Vector;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.mucommander.conf.MuConfigurations;
 import com.mucommander.conf.MuPreference;
 import com.mucommander.conf.MuPreferences;
@@ -63,11 +33,20 @@ import com.mucommander.text.Translator;
 import com.mucommander.ui.button.ButtonChoicePanel;
 import com.mucommander.ui.button.CollapseExpandButton;
 import com.mucommander.ui.chooser.SizeChooser;
-import com.mucommander.ui.dialog.FocusDialog;
+import com.mucommander.ui.dialog.NonModalDialog;
 import com.mucommander.ui.icon.IconManager;
 import com.mucommander.ui.layout.YBoxPanel;
 import com.mucommander.ui.main.MainFrame;
 import com.mucommander.ui.main.StatusBar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Vector;
 
 /**
  * This dialog informs the user of the progress made by a FileJob and allows to control it: pause/resume it, stop it,
@@ -75,7 +54,7 @@ import com.mucommander.ui.main.StatusBar;
  *
  * @author Maxence Bernard
  */
-public class ProgressDialog extends FocusDialog implements ActionListener, ItemListener, ChangeListener, FileJobListener, JobProgressListener {
+public class ProgressDialog extends NonModalDialog implements ActionListener, ItemListener, ChangeListener, FileJobListener, JobProgressListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProgressDialog.class);
 	
     private JLabel currentFileLabel;
