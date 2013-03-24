@@ -19,12 +19,15 @@
 package com.mucommander.ui.action.impl;
 
 import com.mucommander.command.Command;
+import com.mucommander.command.CommandManager;
 import com.mucommander.commons.file.AbstractFile;
 import com.mucommander.commons.file.FileOperation;
 import com.mucommander.commons.file.filter.AndFileFilter;
 import com.mucommander.commons.file.filter.AttributeFileFilter;
 import com.mucommander.commons.file.filter.FileOperationFilter;
 import com.mucommander.commons.file.impl.local.LocalFile;
+import com.mucommander.job.FileJob;
+import com.mucommander.job.TempEditJob;
 import com.mucommander.job.TempOpenWithJob;
 import com.mucommander.process.ProcessRunner;
 import com.mucommander.text.Translator;
@@ -85,11 +88,17 @@ abstract class AbstractViewerAction extends SelectedFileAction {
                     catch(Exception e) {
                         InformationDialog.showErrorDialog(mainFrame);}
                 }
-                
+
                 // If it's distant, copies it locally before running the custom editor on it.
                 else {
                     ProgressDialog progressDialog = new ProgressDialog(mainFrame, Translator.get("copy_dialog.copying"));
-                    TempOpenWithJob job = new TempOpenWithJob(progressDialog, mainFrame, file, customCommand);
+                    FileJob job;
+                    // If I want to edit it, I would like to save my changes to remote storage/server.
+                    if (CommandManager.EDITOR_ALIAS.equals(customCommand.getAlias())) {
+                        job = new TempEditJob(progressDialog, mainFrame, file, customCommand);
+                    } else {
+                        job = new TempOpenWithJob(progressDialog, mainFrame, file, customCommand);
+                    }
                     progressDialog.start(job);
                 }
             }
