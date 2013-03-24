@@ -13,10 +13,12 @@ Current repository contains also sources of all required libraries:
 
 Key difference from v0.9.0:
 * supports HDFS 2.0.0
-
+* copy, deletion, move of files / dirs is in background
 
 ===========
 Sources could be built right after git clone.
 To get runnable version the one must
 * run mvn clean install
 * in ./manager/target directory run manager-{version}.jar (it uses target/lib folder)
+
+===========
