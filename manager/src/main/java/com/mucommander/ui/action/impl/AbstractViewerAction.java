@@ -27,7 +27,7 @@ import com.mucommander.commons.file.filter.AttributeFileFilter;
 import com.mucommander.commons.file.filter.FileOperationFilter;
 import com.mucommander.commons.file.impl.local.LocalFile;
 import com.mucommander.job.FileJob;
-import com.mucommander.job.TempEditJob;
+import com.mucommander.job.TempEditWithJob;
 import com.mucommander.job.TempOpenWithJob;
 import com.mucommander.process.ProcessRunner;
 import com.mucommander.text.Translator;
@@ -95,7 +95,7 @@ abstract class AbstractViewerAction extends SelectedFileAction {
                     FileJob job;
                     // If I want to edit it, I would like to save my changes to remote storage/server.
                     if (CommandManager.EDITOR_ALIAS.equals(customCommand.getAlias())) {
-                        job = new TempEditJob(progressDialog, mainFrame, file, customCommand);
+                        job = new TempEditWithJob(progressDialog, mainFrame, file, customCommand);
                     } else {
                         job = new TempOpenWithJob(progressDialog, mainFrame, file, customCommand);
                     }
