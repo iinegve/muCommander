@@ -33,12 +33,12 @@ public class TempEditWithJob extends TempCopyJob {
     /**
      * File to execute
      */
-    private volatile AbstractFile fileToOpen;
+    private AbstractFile fileToOpen;
 
     /**
      * Timestamp after copying the {@link #fileToOpen} to temp directory
      */
-    private volatile long lastModified;
+    private long lastModified;
 
     /**
      * Creates a new <code>TempEditWithJob</code> that operates on a file.
