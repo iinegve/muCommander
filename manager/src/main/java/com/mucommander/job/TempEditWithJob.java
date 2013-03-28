@@ -83,6 +83,9 @@ public class TempEditWithJob extends TempCopyJob {
 
         try {
             AbstractProcess process = ProcessRunner.execute(command.getTokens(fileToOpen), baseDestFolder);
+            //dialogue is no longer needed
+            getProgressDialog().dispose();
+
             process.waitFor();
             //check if file was modified since opened in editor, in order to avoid superfluous copying
             if (lastModified != getLastModified()) {
