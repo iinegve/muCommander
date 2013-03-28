@@ -34,19 +34,22 @@ public class TempEditWithJob extends TempCopyJob {
      * File to execute
      */
     private volatile AbstractFile fileToOpen;
+
+    /**
+     * Timestamp after copying the {@link #fileToOpen} to temp directory
+     */
     private volatile long lastModified;
 
     /**
-     * Creates a new <code>TempEditWithJob</code> that operates on a set of files.
-     * Only a single command get executed, operating on all files.
+     * Creates a new <code>TempEditWithJob</code> that operates on a file.
      *
      * @param progressDialog   the ProgressDialog that monitors this job
      * @param mainFrame        the MainFrame this job is attached to
-     * @param remoteFileToOpen the set of files to copy to a temporary location and execute
+     * @param remoteFileToOpen file to copy to a temporary location and execute
      * @param command          the command used to execute the temporary file
      */
     public TempEditWithJob(ProgressDialog progressDialog, MainFrame mainFrame, AbstractFile remoteFileToOpen, Command command) {
-        super(progressDialog, mainFrame, remoteFileToOpen);
+        super(progressDialog, mainFrame, new FileSet(remoteFileToOpen.getParent(), remoteFileToOpen));
         this.command = command;
     }
 
@@ -55,11 +58,21 @@ public class TempEditWithJob extends TempCopyJob {
         if (!super.processFile(file, recurseParams))
             return false;
 
+        //I would like to verify that it was once
         fileToOpen = currentDestFile;
         lastModified = getLastModified();
         return true;
     }
 
+    /**
+     * Returns the time that the file denoted by {@link #fileToOpen} was
+     * last modified.
+     *
+     * @return A <code>long</code> value representing the time the file was
+     *         last modified, measured in milliseconds since the epoch
+     *         (00:00:00 GMT, January 1, 1970), or <code>0L</code> if the
+     *         file does not exist or if an I/O error occurs
+     */
     private long getLastModified() {
         return new File(fileToOpen.getPath()).lastModified();
     }
@@ -71,13 +84,14 @@ public class TempEditWithJob extends TempCopyJob {
         try {
             AbstractProcess process = ProcessRunner.execute(command.getTokens(fileToOpen), baseDestFolder);
             process.waitFor();
+            //check if file was modified since opened in editor, in order to avoid superfluous copying
             if (lastModified != getLastModified()) {
                 ProgressDialog copyBackDialog = new ProgressDialog(getMainFrame(), Translator.get("copy_dialog.copying"));
                 CopyJob copyBackJob = new CopyJob(copyBackDialog, getMainFrame(), new FileSet(baseDestFolder, fileToOpen), getBaseSourceFolder(), getCurrentFile().getName(), CopyJob.COPY_MODE, FileCollisionDialog.OVERWRITE_ACTION);
                 copyBackDialog.start(copyBackJob);
             }
         } catch (Exception e) {
-            LOGGER.debug("Caught exception executing " + command + " " + getCurrentFilename(), e);
+            LOGGER.debug("Caught exception executing " + command + " with file " + fileToOpen, e);
         }
     }
 }
