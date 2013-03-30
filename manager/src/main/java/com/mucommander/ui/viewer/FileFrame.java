@@ -1,9 +1,6 @@
 package com.mucommander.ui.viewer;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Image;
+import java.awt.*;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -21,33 +18,34 @@ import com.mucommander.ui.main.MainFrame;
 
 /**
  * This class is used as an abstraction for the {@link EditorFrame} and {@link ViewerFrame}.
- * 
+ *
  * @author Arik Hadas
  */
 public abstract class FileFrame extends JFrame {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileFrame.class);
 
-	private final static Dimension WAIT_DIALOG_SIZE = new Dimension(400, 350);
+    private final static Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+    protected final static Dimension PREFERRED_SIZE = new Dimension((int) SCREEN_SIZE.getWidth() * 6 / 10, (int) SCREEN_SIZE.getHeight() * 6 / 10);
 
 	// The file presenter within this frame
 	private FilePresenter filePresenter;
-	
+
 	// The main frame from which this frame was initiated
 	private MainFrame mainFrame;
-	
+
 	FileFrame(MainFrame mainFrame, AbstractFile file, Image icon) {
 		this.mainFrame = mainFrame;
 
 		setIconImage(icon);
-		
+
 		// Call #dispose() on close (default is hide)
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        
+
         setResizable(true);
-        
+
         initContentPane(file);
 	}
-	
+
 	protected void initContentPane(final AbstractFile file) {
 		try {
 			filePresenter = createFilePresenter(file);
@@ -63,7 +61,7 @@ public abstract class FileFrame extends JFrame {
 		}
 
 		AsyncPanel asyncPanel = new AsyncPanel() {
-        	
+
             @Override
             public JComponent getTargetComponent() {
                 try {
@@ -80,7 +78,7 @@ public abstract class FileFrame extends JFrame {
                 }
 
                 setJMenuBar(filePresenter.getMenuBar());
-                
+
                 return filePresenter;
             }
 
@@ -101,7 +99,7 @@ public abstract class FileFrame extends JFrame {
         contentPane.add(asyncPanel, BorderLayout.CENTER);
         setContentPane(contentPane);
 
-        setSize(WAIT_DIALOG_SIZE);
+        setSize(PREFERRED_SIZE);
         DialogToolkit.centerOnWindow(this, getMainFrame());
 
         setVisible(true);
@@ -121,7 +119,7 @@ public abstract class FileFrame extends JFrame {
 
 	/**
 	 * Returns whether this frame is set to be displayed in full screen mode
-	 * 
+	 *
 	 * @return true if the frame is set to full screen, false otherwise
 	 */
 	public boolean isFullScreen() {
@@ -141,18 +139,18 @@ public abstract class FileFrame extends JFrame {
 
         DialogToolkit.centerOnWindow(this, getMainFrame());
     }
-    
+
     @Override
     public void dispose() {
     	filePresenter.beforeCloseHook();
     	super.dispose();
     }
-    
+
     //////////////////////
     // Abstract methods //
     //////////////////////
-    
+
     protected abstract void showGenericErrorDialog();
-    
+
     protected abstract FilePresenter createFilePresenter(AbstractFile file) throws UserCancelledException;
 }
