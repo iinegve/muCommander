@@ -47,7 +47,7 @@ public class ViewerFrame extends FileFrame {
         super(mainFrame, file, icon);
 
         setMinimumSize(MIN_DIMENSION);
-        setPreferredSize(PREFERRED_SIZE);
+        setPreferredSize(calcPreferredSize());
     }
 
     ////////////////////////
