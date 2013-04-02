@@ -24,9 +24,6 @@ import com.mucommander.ui.main.MainFrame;
 public abstract class FileFrame extends JFrame {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileFrame.class);
 
-    private final static Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-    protected final static Dimension PREFERRED_SIZE = new Dimension((int) SCREEN_SIZE.getWidth() * 6 / 10, (int) SCREEN_SIZE.getHeight() * 6 / 10);
-
 	// The file presenter within this frame
 	private FilePresenter filePresenter;
 
@@ -99,7 +96,7 @@ public abstract class FileFrame extends JFrame {
         contentPane.add(asyncPanel, BorderLayout.CENTER);
         setContentPane(contentPane);
 
-        setSize(PREFERRED_SIZE);
+        setSize(calcPreferredSize());
         DialogToolkit.centerOnWindow(this, getMainFrame());
 
         setVisible(true);
@@ -126,6 +123,10 @@ public abstract class FileFrame extends JFrame {
 		return (getExtendedState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
 	}
 
+    protected Dimension calcPreferredSize() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        return new Dimension((int) screenSize.getWidth() * 6 / 10, (int) screenSize.getHeight() * 6 / 10);
+    }
 	////////////////////////
     // Overridden methods //
     ////////////////////////
