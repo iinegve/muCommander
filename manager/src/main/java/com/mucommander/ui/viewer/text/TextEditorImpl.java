@@ -21,20 +21,21 @@ package com.mucommander.ui.viewer.text;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.awt.event.*;
+import java.io.*;
+import java.nio.CharBuffer;
 
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import com.google.common.io.Closeables;
+import com.mucommander.commons.file.AbstractFile;
+import com.mucommander.commons.io.BufferPool;
+import com.mucommander.commons.io.bom.BOMInputStream;
 import com.mucommander.ui.theme.ColorChangedEvent;
 import com.mucommander.ui.theme.FontChangedEvent;
 import com.mucommander.ui.theme.Theme;
@@ -53,7 +54,7 @@ class TextEditorImpl implements ThemeListener {
 	private JFrame frame;
 	private JTextArea textArea;
 
-
+    private InputStream input;
 	////////////////////
 	// Initialization //
 	////////////////////
@@ -67,7 +68,7 @@ class TextEditorImpl implements ThemeListener {
 	}
 
 	private void initTextArea(boolean isEditable) {
-		textArea = new JTextArea() {
+        textArea = new JTextArea() {
 			@Override
 			public Insets getInsets() {
 				return new Insets(4, 3, 4, 3);
@@ -209,10 +210,24 @@ class TextEditorImpl implements ThemeListener {
 		textArea.getDocument().addDocumentListener(documentListener);
 	}
 
-	void read(Reader reader) throws IOException {
-		// Feed the file's contents to text area
-		textArea.read(reader, null);
+	void read(AbstractFile file, String encoding) throws IOException {
+        input = file.getInputStream();
+        // If the encoding is UTF-something, wrap the stream in a BOMInputStream to filter out the byte-order mark
+        // (see ticket #245)
+        if(encoding.toLowerCase().startsWith("utf")) {
+            input = new BOMInputStream(input);
+        }
 
+        BufferedReader isr = new BufferedReader(new InputStreamReader(input, encoding), 4096);
+        // Feed the file's contents to text area
+        String line;
+        int rows = 20;
+		while((line = isr.readLine()) != null && rows-- > 0) {
+            textArea.append(line);
+            textArea.append("\n");
+        }
+
+        Closeables.closeQuietly(input);
 		// Move cursor to the top
 		textArea.setCaretPosition(0);
 	}
@@ -262,4 +277,8 @@ class TextEditorImpl implements ThemeListener {
 		if(event.getFontId() == Theme.EDITOR_FONT)
 			textArea.setFont(event.getFont());
 	}
+
+    public void beforeCloseHook() {
+        Closeables.closeQuietly(input);
+    }
 }
