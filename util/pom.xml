@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.mucommander</groupId>
         <artifactId>mucommander-mvn</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.9.1-SNAPSHOT</version>
     </parent>
 
     <groupId>com.mucommander.commons</groupId>
     <artifactId>util</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.9.1-SNAPSHOT</version>
 
     <properties>
         <!-- All resources and files use UTF-8 -->
