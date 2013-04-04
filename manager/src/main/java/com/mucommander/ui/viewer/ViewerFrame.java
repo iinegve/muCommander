@@ -34,9 +34,9 @@ import java.awt.*;
  * @author Maxence Bernard, Arik Hadas
  */
 public class ViewerFrame extends FileFrame {
-	
+
     private final static Dimension MIN_DIMENSION = new Dimension(200, 150);
-	
+
     /**
      * Creates a new ViewerFrame to start viewing the given file.
      *
@@ -45,8 +45,9 @@ public class ViewerFrame extends FileFrame {
      */
     ViewerFrame(MainFrame mainFrame, AbstractFile file, Image icon) {
         super(mainFrame, file, icon);
-        
+
         setMinimumSize(MIN_DIMENSION);
+        setPreferredSize(calcPreferredSize());
     }
 
     ////////////////////////

@@ -18,6 +18,7 @@
 
 package com.mucommander.ui.viewer.text;
 
+import com.google.common.io.Closeables;
 import com.mucommander.commons.file.AbstractFile;
 import com.mucommander.commons.io.BinaryDetector;
 import com.mucommander.text.Translator;
@@ -57,6 +58,7 @@ public class TextFactory implements ViewerFactory, EditorFactory {
         // Warn the user if the file is large that a certain size as the whole file is loaded into memory
         // (in a JTextArea)
         if(file.getSize()>1048576)
+            //TODO: Alas! That's just a switch to either show warning or not, why throw Exception?!
             throw new WarnUserException(Translator.get("file_viewer.large_file_warning"));
 
         // Warn the user if the file looks like a binary file
@@ -70,9 +72,7 @@ public class TextFactory implements ViewerFactory, EditorFactory {
             // Not much too do
         }
         finally {
-            if(in!=null) {
-                try { in.close(); } catch(IOException e2) {}
-            }
+            Closeables.closeQuietly(in);
         }
 
         return true;
