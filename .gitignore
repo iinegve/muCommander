@@ -10,6 +10,7 @@ target
 *.iws
 *.swp
 *~
+.DS_Store
 .idea/
 */target/
 *.iml
