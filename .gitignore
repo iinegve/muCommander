@@ -1,6 +1,7 @@
 .project
 .settings
 .classpath
+.svn
 target
 */target
 */*/target
