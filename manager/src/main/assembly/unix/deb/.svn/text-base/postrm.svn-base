@@ -1,4 +1,0 @@
-#! /bin/sh
-if [ -h /usr/bin/mucommander ] ; then
-  rm /usr/bin/mucommander
-fi

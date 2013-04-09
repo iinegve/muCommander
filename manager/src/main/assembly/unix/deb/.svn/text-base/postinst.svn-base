@@ -1,2 +1,0 @@
-#! /bin/sh
-ln -s /usr/share/mucommander/mucommander.sh /usr/bin/mucommander
