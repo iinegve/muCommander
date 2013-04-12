@@ -35,6 +35,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.google.common.io.Closeables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +86,8 @@ class TextEditor extends FileEditor implements DocumentListener, EncodingListene
     private TextViewer textViewerDelegate;
     
     public TextEditor() {
-    	textViewerDelegate = new TextViewer(textEditorImpl = new TextEditorImpl(true)) {
+        //TODO: kill delegate or else TextEditor is working the same way as Viewer - read file by scrolling
+    	textViewerDelegate = new TextViewer(textEditorImpl = new TextEditorImpl()) {
     		
     		@Override
     		protected void setComponentToPresent(JComponent component) {
@@ -131,11 +133,11 @@ class TextEditor extends FileEditor implements DocumentListener, EncodingListene
 		getViewport().add(component);
 	}
     
-    void loadDocument(InputStream in, String encoding, DocumentListener documentListener) throws IOException {
-    	textViewerDelegate.loadDocument(in, encoding, documentListener);
+    void loadDocument(AbstractFile file, String encoding, DocumentListener documentListener) throws IOException {
+    	textViewerDelegate.loadDocument(file, encoding, documentListener);
     	
     	if(encoding.toLowerCase().startsWith("utf")) {
-    		bom = ((BOMInputStream)in).getBOM();
+    		bom = ((BOMInputStream)file.getInputStream()).getBOM();
     	}
     }
     
@@ -172,6 +174,7 @@ class TextEditor extends FileEditor implements DocumentListener, EncodingListene
     	MuConfigurations.getPreferences().setVariable(MuPreference.LINE_NUMBERS, getRowHeader().getView() != null);
 
     	setTextPresenterDisplayedInFullScreen(getFrame().isFullScreen());
+        textViewerDelegate.beforeCloseHook();
     }
 
     ///////////////////////////////
@@ -187,12 +190,7 @@ class TextEditor extends FileEditor implements DocumentListener, EncodingListene
             write(out);
         }
         finally {
-            if(out != null) {
-                try {out.close();}
-                catch(IOException e) {
-                    // Ignored
-                }
-            }
+            Closeables.closeQuietly(out);
         }
 
         // We get here only if the destination file was updated successfully
@@ -285,8 +283,7 @@ class TextEditor extends FileEditor implements DocumentListener, EncodingListene
 
     	try {
     		// Reload the file using the new encoding
-    		// Note: loadDocument closes the InputStream
-    		loadDocument(getCurrentFile().getInputStream(), newEncoding, null);
+    		loadDocument(getCurrentFile(), newEncoding, null);
     	}
     	catch(IOException ex) {
     		InformationDialog.showErrorDialog(getFrame(), Translator.get("read_error"), Translator.get("file_editor.cannot_read_file", getCurrentFile().getName()));
