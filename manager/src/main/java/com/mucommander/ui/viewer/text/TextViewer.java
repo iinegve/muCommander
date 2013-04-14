@@ -63,8 +63,8 @@ class TextViewer extends FileViewer implements EncodingListener {
 
 	public final static String CUSTOM_FULL_SCREEN_EVENT = "CUSTOM_FULL_SCREEN_EVENT";
 
-	private TextEditorImpl textEditorImpl;
-    
+	private TextProcessor textViewerImpl;
+
     /** Menu items */
     // Menus //
     private JMenu editMenu;
@@ -77,24 +77,24 @@ class TextViewer extends FileViewer implements EncodingListener {
     private JMenuItem findPreviousItem;
     private JMenuItem toggleLineWrapItem;
     private JMenuItem toggleLineNumbersItem;
-    
-    private String encoding;
-    
-    TextViewer() {
-    	this(new TextEditorImpl(false));
-    }
-    
-    TextViewer(TextEditorImpl textEditorImpl) {
-    	this.textEditorImpl = textEditorImpl;
 
-    	setComponentToPresent(textEditorImpl.getTextArea());
-    	
+    private String encoding;
+
+    TextViewer() {
+    	this(new TextViewerImpl());
+    }
+
+    TextViewer(TextProcessor textViewerImpl) {
+    	this.textViewerImpl = textViewerImpl;
+
+    	setComponentToPresent(textViewerImpl.getTextArea());
+
     	showLineNumbers(MuConfigurations.getPreferences().getVariable(MuPreference.LINE_NUMBERS, MuPreferences.DEFAULT_LINE_NUMBERS));
-    	textEditorImpl.wrap(MuConfigurations.getPreferences().getVariable(MuPreference.LINE_WRAP, MuPreferences.DEFAULT_LINE_WRAP));
+    	textViewerImpl.wrap(MuConfigurations.getPreferences().getVariable(MuPreference.LINE_WRAP, MuPreferences.DEFAULT_LINE_WRAP));
 
     	initMenuBarItems();
     }
-    
+
     @Override
     public void setFrame(FileFrame frame) {
         super.setFrame(frame);
@@ -108,13 +108,13 @@ class TextViewer extends FileViewer implements EncodingListener {
     		}
     	});
     }
-    
+
     void startEditing(AbstractFile file, DocumentListener documentListener) throws IOException {
-        // Load the file into the text area
-        loadDocument(file, detectEncoding(file), documentListener);
+        encoding = detectEncoding(file);
+        loadDocument(file, encoding, documentListener);
     }
 
-    String detectEncoding(AbstractFile file) throws IOException {
+    private String detectEncoding(AbstractFile file) throws IOException {
         InputStream in = null;
 
         try {
@@ -132,18 +132,16 @@ class TextViewer extends FileViewer implements EncodingListener {
     }
 
     void loadDocument(AbstractFile file, String encoding, DocumentListener documentListener) throws IOException {
-        this.encoding = encoding;
-        textEditorImpl.read(file, encoding);
-        
-        // Listen to document changes
-        if(documentListener!=null)
-            textEditorImpl.addDocumentListener(documentListener);
+        textViewerImpl.read(file, encoding);
+
+        if(documentListener != null)
+            textViewerImpl.addDocumentListener(documentListener);
     }
-    
+
     @Override
     public JMenuBar getMenuBar() {
     	JMenuBar menuBar = super.getMenuBar();
-    	
+
     	// Encoding menu
     	EncodingMenu encodingMenu = new EncodingMenu(new DialogOwner(getFrame()), encoding);
         encodingMenu.addEncodingListener(this);
@@ -151,27 +149,27 @@ class TextViewer extends FileViewer implements EncodingListener {
         menuBar.add(editMenu);
         menuBar.add(viewMenu);
         menuBar.add(encodingMenu);
-        
+
         return menuBar;
     }
-    
+
     @Override
     public void beforeCloseHook() {
-    	MuConfigurations.getPreferences().setVariable(MuPreference.LINE_WRAP, textEditorImpl.isWrap());
+    	MuConfigurations.getPreferences().setVariable(MuPreference.LINE_WRAP, textViewerImpl.isWrap());
     	MuConfigurations.getPreferences().setVariable(MuPreference.LINE_NUMBERS, getRowHeader().getView() != null);
 
     	setTextPresenterDisplayedInFullScreen(getFrame().isFullScreen());
-        textEditorImpl.beforeCloseHook();
+        textViewerImpl.beforeCloseHook();
     }
 
     String getEncoding() {
     	return encoding;
     }
-    
+
     protected void showLineNumbers(boolean show) {
-    	setRowHeaderView(show ? new TextLineNumbersPanel(textEditorImpl.getTextArea()) : null);
+    	setRowHeaderView(show ? new TextLineNumbersPanel(textViewerImpl.getTextArea()) : null);
     }
-    
+
     protected void initMenuBarItems() {
     	// Edit menu
     	editMenu = new JMenu(Translator.get("text_viewer.edit"));
@@ -185,16 +183,16 @@ class TextViewer extends FileViewer implements EncodingListener {
     	findItem = MenuToolkit.addMenuItem(editMenu, Translator.get("text_viewer.find"), menuItemMnemonicHelper, KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK), this);
     	findNextItem = MenuToolkit.addMenuItem(editMenu, Translator.get("text_viewer.find_next"), menuItemMnemonicHelper, KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0), this);
     	findPreviousItem = MenuToolkit.addMenuItem(editMenu, Translator.get("text_viewer.find_previous"), menuItemMnemonicHelper, KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.SHIFT_DOWN_MASK), this);
-    	
+
     	// View menu
     	viewMenu = new JMenu(Translator.get("text_viewer.view"));
-    	
+
     	toggleLineWrapItem = MenuToolkit.addCheckBoxMenuItem(viewMenu, Translator.get("text_viewer.line_wrap"), menuItemMnemonicHelper, null, this);
-    	toggleLineWrapItem.setSelected(textEditorImpl.isWrap());
+    	toggleLineWrapItem.setSelected(textViewerImpl.isWrap());
     	toggleLineNumbersItem = MenuToolkit.addCheckBoxMenuItem(viewMenu, Translator.get("text_viewer.line_numbers"), menuItemMnemonicHelper, null, this);
     	toggleLineNumbersItem.setSelected(getRowHeader().getView() != null);
     }
-    
+
     ///////////////////////////////
     // FileViewer implementation //
     ///////////////////////////////
@@ -203,7 +201,7 @@ class TextViewer extends FileViewer implements EncodingListener {
     public void show(AbstractFile file) throws IOException {
         startEditing(file, null);
     }
-    
+
     ///////////////////////////////////
     // ActionListener implementation //
     ///////////////////////////////////
@@ -212,19 +210,19 @@ class TextViewer extends FileViewer implements EncodingListener {
         Object source = e.getSource();
 
         if(source == copyItem)
-        	textEditorImpl.copy();
+        	textViewerImpl.copy();
         else if(source == selectAllItem)
-        	textEditorImpl.selectAll();
+            textViewerImpl.selectAll();
         else if(source == findItem)
-        	textEditorImpl.find();
+            textViewerImpl.find();
         else if(source == findNextItem)
-        	textEditorImpl.findNext();
+            textViewerImpl.findNext();
         else if(source == findPreviousItem)
-        	textEditorImpl.findPrevious();
+            textViewerImpl.findPrevious();
         else if(source == toggleLineWrapItem)
-        	textEditorImpl.wrap(toggleLineWrapItem.isSelected());
+            textViewerImpl.wrap(toggleLineWrapItem.isSelected());
         else if(source == toggleLineNumbersItem)
-        	setRowHeaderView(toggleLineNumbersItem.isSelected() ? new TextLineNumbersPanel(textEditorImpl.getTextArea()) : null);
+        	setRowHeaderView(toggleLineNumbersItem.isSelected() ? new TextLineNumbersPanel(textViewerImpl.getTextArea()) : null);
         else
         	super.actionPerformed(e);
     }
@@ -240,6 +238,6 @@ class TextViewer extends FileViewer implements EncodingListener {
     	}
     	catch(IOException ex) {
     		InformationDialog.showErrorDialog(getFrame(), Translator.get("read_error"), Translator.get("file_editor.cannot_read_file", getCurrentFile().getName()));
-    	}   
+    	}
     }
 }

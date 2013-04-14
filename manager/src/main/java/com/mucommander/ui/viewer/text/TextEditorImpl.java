@@ -18,6 +18,7 @@
 
 package com.mucommander.ui.viewer.text;
 
+<<<<<<< HEAD
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -41,12 +42,22 @@ import com.mucommander.ui.theme.FontChangedEvent;
 import com.mucommander.ui.theme.Theme;
 import com.mucommander.ui.theme.ThemeListener;
 import com.mucommander.ui.theme.ThemeManager;
+=======
+import com.google.common.io.Closeables;
+import com.mucommander.commons.file.AbstractFile;
+import com.mucommander.commons.io.bom.BOMInputStream;
+
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import java.io.*;
+>>>>>>> e785235d19ca9b2bdf1e8149915ccde0fd590a49
 
 /**
  * Text editor implementation used by {@link TextViewer} and {@link TextEditor}.
  *
  * @author Maxence Bernard, Mariusz Jakubowski, Nicolas Rinaudo, Arik Hadas
  */
+<<<<<<< HEAD
 class TextEditorImpl implements ThemeListener {
 
 	private String searchString;
@@ -215,10 +226,27 @@ class TextEditorImpl implements ThemeListener {
         // If the encoding is UTF-something, wrap the stream in a BOMInputStream to filter out the byte-order mark
         // (see ticket #245)
         if(encoding.toLowerCase().startsWith("utf")) {
+=======
+class TextEditorImpl extends TextProcessor {
+
+    @Override
+    protected void initTextArea() {
+        super.initTextArea();
+        textArea.setEditable(true);
+    }
+
+    void read(AbstractFile file, String encoding) throws IOException {
+        InputStream input = file.getInputStream();
+
+        // If the encoding is UTF-something, wrap the stream in a BOMInputStream to filter out the byte-order mark
+        // (see ticket #245)
+        if (encoding.toLowerCase().startsWith("utf")) {
+>>>>>>> e785235d19ca9b2bdf1e8149915ccde0fd590a49
             input = new BOMInputStream(input);
         }
 
         BufferedReader isr = new BufferedReader(new InputStreamReader(input, encoding), 4096);
+<<<<<<< HEAD
         // Feed the file's contents to text area
         String line;
         int rows = 20;
@@ -280,5 +308,25 @@ class TextEditorImpl implements ThemeListener {
 
     public void beforeCloseHook() {
         Closeables.closeQuietly(input);
+=======
+        try {
+            textArea.read(isr, null);
+        } finally {
+            Closeables.closeQuietly(isr);
+        }
+
+        // Move cursor to the top
+        textArea.setCaretPosition(0);
+    }
+
+    void write(Writer writer) throws IOException {
+        Document document = textArea.getDocument();
+
+        try {
+            textArea.getUI().getEditorKit(textArea).write(new BufferedWriter(writer), document, 0, document.getLength());
+        } catch (BadLocationException e) {
+            throw new IOException(e.getMessage());
+        }
+>>>>>>> e785235d19ca9b2bdf1e8149915ccde0fd590a49
     }
 }

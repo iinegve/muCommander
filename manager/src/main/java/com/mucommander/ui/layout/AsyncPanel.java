@@ -117,9 +117,9 @@ public abstract class AsyncPanel extends JPanel {
      *
      * @return the default component to be displayed while the target component is being loaded
      */
-    private static JComponent getDefaultWaitComponent() {
+    public static JComponent getDefaultWaitComponent() {
         JLabel label = new JLabel(Translator.get("loading"));
-        label.setIcon(new SpinningDial(24, 24, true));
+//        label.setIcon(new SpinningDial(24, 24, true));
 
         // Center the label both horizontally and vertically
         JPanel tempPanel = new JPanel(new GridBagLayout());

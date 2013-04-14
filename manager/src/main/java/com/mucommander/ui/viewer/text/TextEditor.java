@@ -86,7 +86,8 @@ class TextEditor extends FileEditor implements DocumentListener, EncodingListene
     private TextViewer textViewerDelegate;
     
     public TextEditor() {
-    	textViewerDelegate = new TextViewer(textEditorImpl = new TextEditorImpl(true)) {
+        //TODO: kill delegate or else TextEditor is working the same way as Viewer - read file by scrolling
+    	textViewerDelegate = new TextViewer(textEditorImpl = new TextEditorImpl()) {
     		
     		@Override
     		protected void setComponentToPresent(JComponent component) {
@@ -173,6 +174,7 @@ class TextEditor extends FileEditor implements DocumentListener, EncodingListene
     	MuConfigurations.getPreferences().setVariable(MuPreference.LINE_NUMBERS, getRowHeader().getView() != null);
 
     	setTextPresenterDisplayedInFullScreen(getFrame().isFullScreen());
+        textViewerDelegate.beforeCloseHook();
     }
 
     ///////////////////////////////
