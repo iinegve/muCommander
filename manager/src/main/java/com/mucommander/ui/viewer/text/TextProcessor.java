@@ -1,19 +1,16 @@
 package com.mucommander.ui.viewer.text;
 
-import com.google.common.io.Closeables;
 import com.mucommander.commons.file.AbstractFile;
-import com.mucommander.commons.io.bom.BOMInputStream;
 import com.mucommander.ui.theme.*;
 
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * @author Eugene Morozov
@@ -58,7 +55,7 @@ abstract class TextProcessor implements ThemeListener {
              * we just bubble it up to the parent component of the JTextArea.
              */
             public void mouseWheelMoved(MouseWheelEvent e) {
-                boolean isCtrlPressed = (e.getModifiers() & KeyEvent.CTRL_MASK)!=0;
+                boolean isCtrlPressed = (e.getModifiers() & KeyEvent.CTRL_MASK) != 0;
                 if (isCtrlPressed) {
                     Font currentFont = textArea.getFont();
                     int currentFontSize = currentFont.getSize();
@@ -86,10 +83,10 @@ abstract class TextProcessor implements ThemeListener {
     void find() {
         FindDialog findDialog = new FindDialog(null);
 
-        if(findDialog.wasValidated()) {
+        if (findDialog.wasValidated()) {
             searchString = findDialog.getSearchString().toLowerCase();
 
-            if(!searchString.equals(""))
+            if (!searchString.equals(""))
                 doSearch(0, true);
         }
 
@@ -193,7 +190,7 @@ abstract class TextProcessor implements ThemeListener {
      * Receives theme color changes notifications.
      */
     public void colorChanged(ColorChangedEvent event) {
-        switch(event.getColorId()) {
+        switch (event.getColorId()) {
             case Theme.EDITOR_FOREGROUND_COLOR:
                 textArea.setForeground(event.getColor());
                 break;
@@ -216,7 +213,7 @@ abstract class TextProcessor implements ThemeListener {
      * Receives theme font changes notifications.
      */
     public void fontChanged(FontChangedEvent event) {
-        if(event.getFontId() == Theme.EDITOR_FONT)
+        if (event.getFontId() == Theme.EDITOR_FONT)
             textArea.setFont(event.getFont());
     }
 

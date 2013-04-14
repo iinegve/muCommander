@@ -1,29 +1,25 @@
 package com.mucommander.ui.viewer.text;
 
 import com.google.common.io.Closeables;
+import com.google.common.util.concurrent.Futures;
 import com.mucommander.commons.file.AbstractFile;
 import com.mucommander.commons.io.bom.BOMInputStream;
-import com.mucommander.text.Translator;
-import com.mucommander.ui.dialog.DialogToolkit;
-import com.mucommander.ui.icon.SpinningDial;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 /**
  * @author Eugene Morozov
  */
 public class TextViewerImpl extends TextProcessor {
 
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private BufferedReader reader;
 
-    /**
-     * Number of read symbols from the {@link #reader}.
-     */
-    private int count = 0;
+    private boolean endOfStreamIsReached = false;
 
     /**
      * Buffer to download file into textArea.
@@ -35,7 +31,6 @@ public class TextViewerImpl extends TextProcessor {
      */
     private char[] buffer = new char[200];
 
-
     @Override
     protected void initTextArea() {
         super.initTextArea();
@@ -46,14 +41,10 @@ public class TextViewerImpl extends TextProcessor {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 switch (e.getScrollType()) {
                     case MouseWheelEvent.WHEEL_UNIT_SCROLL:
-                        if (e.getUnitsToScroll() > 0) {
-                            try {
-                                readRows(e.getUnitsToScroll());
-                            } catch (IOException ex) {
-                                //TODO: show dialog with error message - cannot read from stream anymore
-                            }
+                        int unitsToScroll = e.getUnitsToScroll();
+                        if (unitsToScroll > 0) {
+                            readRows(unitsToScroll);
                         }
-                        break;
                 }
             }
         });
@@ -61,17 +52,13 @@ public class TextViewerImpl extends TextProcessor {
         textArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                try {
-                    switch (e.getKeyCode()) {
-                        case KeyEvent.VK_DOWN:
-                            readRows(1);
-                            break;
-                        case KeyEvent.VK_PAGE_DOWN:
-                            readRows(calcHeightInRows());
-                            break;
-                    }
-                } catch (IOException ex) {
-                    //TODO: show dialog with error message - cannot read from stream anymore
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_DOWN:
+                        readRows(1);
+                        break;
+                    case KeyEvent.VK_PAGE_DOWN:
+                        readRows(calcHeightInRows());
+                        break;
                 }
             }
         });
@@ -153,65 +140,45 @@ public class TextViewerImpl extends TextProcessor {
      * line it could even kill the app), but in other case it gives much
      * inconvenience for user experience.
      */
-    private void readRows(final int rowsToRead) throws IOException {
-        SwingWorker worker = new SwingWorker() {
+    private void readRows(final int rowsToRead) {
+        if (!endOfStreamIsReached) {
+            SwingWorker<Boolean, String> worker = new SwingWorker<Boolean, String>() {
 
-            private JFrame frame;
-
-            private JFrame createFrame() {
-                GridBagConstraints gbc = new GridBagConstraints();
-                gbc.gridx = 0;
-                gbc.gridy = 0;
-                gbc.fill = GridBagConstraints.BOTH;
-
-                JFrame frame = new JFrame(Translator.get("loading"));
-                JPanel contentPane = new JPanel(new GridBagLayout());
-                JLabel label = new JLabel(Translator.get("loading"));
-                label.setIcon(new SpinningDial(24, 24, true));
-                contentPane.add(label, gbc);
-
-                frame.setContentPane(contentPane);
-                frame.setSize(400, 400);
-                frame.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
-                DialogToolkit.centerOnScreen(frame);
-                System.out.println("Frame created");
-                return frame;
-            }
-
-            @Override
-            protected Object doInBackground() throws Exception {
-                (frame = createFrame()).setVisible(true);
-
-                TimeUnit.SECONDS.sleep(5);
-                int rows = rowsToRead;
-                if (count != -1) {
-                    StringBuilder sb = new StringBuilder(rows * buffer.length);
+                @Override
+                protected Boolean doInBackground() throws Exception {
+                    int rows = rowsToRead;
+                    int count = 0;
                     while (rows-- > 0 && count != -1) {
                         if (textArea.getLineWrap()) {
                             count = reader.read(buffer);
                             if (count != -1) {
-                                sb.append(new String(buffer, 0, count));
+                                publish(new String(buffer, 0, count));
                             }
                         } else {
                             String line = reader.readLine();
-                            if (line != null) {
-                                sb.append(line).append("\n");
-                            } else {
-                                count = -1;
+                            if (line == null) {
+                                return true;
                             }
+                            publish(line + LINE_SEPARATOR);
                         }
                     }
-                    textArea.append(sb.toString());
+                    return count == -1;
                 }
-                return null;
-            }
 
-            @Override
-            protected void done() {
-                frame.dispose();
-            }
-        };
-        worker.run();
+                @Override
+                protected void process(List<String> chunks) {
+                    for (String chunk : chunks) {
+                        textArea.append(chunk);
+                    }
+                }
+
+                @Override
+                protected void done() {
+                    endOfStreamIsReached = Futures.getUnchecked(this);
+                }
+            };
+            worker.run();
+        }
     }
 
     @Override
@@ -221,6 +188,11 @@ public class TextViewerImpl extends TextProcessor {
 
     @Override
     public void beforeCloseHook() {
-        Closeables.closeQuietly(reader);
+        new Thread() {
+            @Override
+            public void run() {
+                Closeables.closeQuietly(reader);
+            }
+        }.start();
     }
 }
