@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.mucommander</groupId>
         <artifactId>mucommander-mvn</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.9.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>manager</artifactId>
@@ -286,16 +286,16 @@
             </plugin>
 
             <!--<plugin>-->
-                <!--<artifactId>maven-antrun-plugin</artifactId>-->
-                <!--<version>1.7</version>-->
-                <!--<configuration>-->
-                    <!--<target>-->
-                        <!--<echo>Blah blah</echo>-->
-                        <!--<ant antfile="${basedir}/build.xml">-->
-                            <!--<target name="release"/>-->
-                        <!--</ant>-->
-                    <!--</target>-->
-                <!--</configuration>-->
+            <!--<artifactId>maven-antrun-plugin</artifactId>-->
+            <!--<version>1.7</version>-->
+            <!--<configuration>-->
+            <!--<target>-->
+            <!--<echo>Blah blah</echo>-->
+            <!--<ant antfile="${basedir}/build.xml">-->
+            <!--<target name="release"/>-->
+            <!--</ant>-->
+            <!--</target>-->
+            <!--</configuration>-->
             <!--</plugin>-->
         </plugins>
     </build>

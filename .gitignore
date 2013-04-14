@@ -1,6 +1,7 @@
 .project
 .settings
 .classpath
+.svn
 target
 */target
 */*/target
@@ -10,6 +11,7 @@ target
 *.iws
 *.swp
 *~
+.DS_Store
 .idea/
 */target/
 *.iml
