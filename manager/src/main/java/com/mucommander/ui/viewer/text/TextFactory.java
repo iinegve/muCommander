@@ -55,12 +55,6 @@ public class TextFactory implements ViewerFactory, EditorFactory {
         if(file.isDirectory())
             return false;
 
-        // Warn the user if the file is large that a certain size as the whole file is loaded into memory
-        // (in a JTextArea)
-        if(file.getSize()>1048576)
-            //TODO: Alas! That's just a switch to either show warning or not, why throw Exception?!
-            throw new WarnUserException(Translator.get("file_viewer.large_file_warning"));
-
         // Warn the user if the file looks like a binary file
         InputStream in = null;
         try {
