@@ -19,7 +19,6 @@
 package com.mucommander.ui.layout;
 
 import com.mucommander.text.Translator;
-import com.mucommander.ui.icon.SpinningDial;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,26 +31,30 @@ import java.awt.*;
  * initialize. It allows to deport their initialization in a separate thread as to not lock the event thread.
  * It works as follows:
  * <ol>
- *  <li>Initially, AsyncPanel displays a 'please wait component' that symbolizes the fact that the contents of the
- *      panel is being loaded.</li>
- *  <li>When AsyncPanel becomes visible on screen, the {@link #getTargetComponent()} method is called to trigger the
- *      initialization of the real component to display.</li>
- *  <li>As soon as the method returns, the wait component is removed and the target component added to AsyncPanel.
- *      If AsyncPanel is the child of a <code>java.awt.Window</code>, the window is repacked to take into account the
- *      new size of this panel.</li>
+ * <li>Initially, AsyncPanel displays a 'please wait component' that symbolizes the fact that the contents of the
+ * panel is being loaded.</li>
+ * <li>When AsyncPanel becomes visible on screen, the {@link #getTargetComponent()} method is called to trigger the
+ * initialization of the real component to display.</li>
+ * <li>As soon as the method returns, the wait component is removed and the target component added to AsyncPanel.
+ * If AsyncPanel is the child of a <code>java.awt.Window</code>, the window is repacked to take into account the
+ * new size of this panel.</li>
  * </ol>
- *
- * <p>This panel tries to be as 'transparent' as possible for the target component: the borders of this panel are empty
+ * <p/>
+ * This panel tries to be as 'transparent' as possible for the target component: the borders of this panel are empty
  * and its layout is a <code>BorderLayout</code> where the target component is added to the center.</p>
  *
  * @author Maxence Bernard
  */
 public abstract class AsyncPanel extends JPanel {
 
-    /** The component displayed while the target component is being loaded */
+    /**
+     * The component displayed while the target component is being loaded
+     */
     private JComponent waitComponent;
 
-    /** This field becomes true when this panel has become visible on screen. */
+    /**
+     * This field becomes true when this panel has become visible on screen.
+     */
     private boolean visibleOnScreen;
 
     /**
@@ -77,7 +80,7 @@ public abstract class AsyncPanel extends JPanel {
         addAncestorListener(new AncestorListener() {
 
             public void ancestorAdded(AncestorEvent e) {
-                if(visibleOnScreen)
+                if (visibleOnScreen)
                     return;
 
                 visibleOnScreen = true;
@@ -86,9 +89,11 @@ public abstract class AsyncPanel extends JPanel {
                 loadTargetComponent();
             }
 
-            public void ancestorRemoved(AncestorEvent event) {}
+            public void ancestorRemoved(AncestorEvent event) {
+            }
 
-            public void ancestorMoved(AncestorEvent event) {}
+            public void ancestorMoved(AncestorEvent event) {
+            }
         });
 
     }
@@ -97,19 +102,16 @@ public abstract class AsyncPanel extends JPanel {
      * Loads the target component by calling {@link #getTargetComponent()} and replace the wait component by it.
      */
     private void loadTargetComponent() {
-        new Thread() {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JComponent targetComponent = getTargetComponent();
-
                 remove(waitComponent);
                 setBorder(new EmptyBorder(0, 0, 0, 0));
-
                 add(targetComponent, BorderLayout.CENTER);
-
                 updateLayout();
             }
-        }.start();
+        });
     }
 
     /**
@@ -117,9 +119,9 @@ public abstract class AsyncPanel extends JPanel {
      *
      * @return the default component to be displayed while the target component is being loaded
      */
-    private static JComponent getDefaultWaitComponent() {
+    public static JComponent getDefaultWaitComponent() {
         JLabel label = new JLabel(Translator.get("loading"));
-        label.setIcon(new SpinningDial(24, 24, true));
+//        label.setIcon(new SpinningDial(24, 24, true));
 
         // Center the label both horizontally and vertically
         JPanel tempPanel = new JPanel(new GridBagLayout());
@@ -146,8 +148,8 @@ public abstract class AsyncPanel extends JPanel {
      */
     protected void updateLayout() {
         Container tla = getTopLevelAncestor();
-        if(tla instanceof Window)
-            ((Window)tla).pack();
+        if (tla instanceof Window)
+            ((Window) tla).pack();
     }
 
 
