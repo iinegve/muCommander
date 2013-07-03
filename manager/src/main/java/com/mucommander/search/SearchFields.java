@@ -1,11 +1,9 @@
 package com.mucommander.search;
 
 /**
- * Created with IntelliJ IDEA.
- * User: sstolpovskiy
- * Date: 02.07.13
- * Time: 16:34
- * To change this template use File | Settings | File Templates.
+ * Constants for seach fields for lucene index.
+ *
+ * @author sstolpovskiy
  */
 public class SearchFields {
     public static final String PATH = "path";

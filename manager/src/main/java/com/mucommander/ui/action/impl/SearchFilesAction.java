@@ -10,11 +10,9 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: sstolpovskiy
- * Date: 01.07.13
- * Time: 14:17
- * To change this template use File | Settings | File Templates.
+ * This action brings up the 'Search' dialog which allows to search in target directory for file pattern.
+ *
+ * @author sstolpovskiy
  */
 public class SearchFilesAction extends MuAction implements InvokesDialog {
 
@@ -51,6 +49,6 @@ public class SearchFilesAction extends MuAction implements InvokesDialog {
 
         public KeyStroke getDefaultAltKeyStroke() { return null; }
 
-        public KeyStroke getDefaultKeyStroke() { return KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK); }
+        public KeyStroke getDefaultKeyStroke() { return KeyStroke.getKeyStroke(KeyEvent.VK_F7, KeyEvent.ALT_DOWN_MASK); }
     }
 }

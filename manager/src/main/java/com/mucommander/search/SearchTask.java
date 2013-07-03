@@ -1,5 +1,6 @@
 package com.mucommander.search;
 
+import com.google.common.io.Closeables;
 import com.mucommander.utils.Callback;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -24,11 +25,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Created with IntelliJ IDEA.
- * User: sstolpovskiy
- * Date: 01.07.13
- * Time: 17:20
- * To change this template use File | Settings | File Templates.
+ * Class encapsulate logic for searching and building lucene index on file system.
+ *
+ * @author sstolpovskiy
  */
 public class SearchTask extends SwingWorker<Boolean, String> {
 
@@ -37,7 +36,6 @@ public class SearchTask extends SwingWorker<Boolean, String> {
     private final DefaultListModel listModel;
     private final Callback finishCallBack;
     private final Pattern regexp;
-    private Thread jobThread;
 
     private static final String indexPath = "/Users/sstolpovskiy/muIndex/";
     private Directory dir;
@@ -52,50 +50,40 @@ public class SearchTask extends SwingWorker<Boolean, String> {
     }
 
     private String prepareRegexpString(String searchString) {
-        if (searchString != null & !searchString.isEmpty()){
+        if (searchString != null & !searchString.isEmpty()) {
             return ".*" + searchString.replace("*", ".*") + ".*";
         }
-        return null;  //To change body of created methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
     protected Boolean doInBackground() throws Exception {
-        try {
-            if (searchString == null) {
-                return false;
-            }
-            dir = FSDirectory.open(new File(indexPath));
-            searchStringInIndex();
-            removeNotExistingDocs();
-            indexFolder();
-            searchStringInIndex();
-            removeNotExistingDocs();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+
+        if (searchString == null) {
+            return false;
         }
+        dir = FSDirectory.open(new File(indexPath));
+        searchStringInIndex();
+        removeNotExistingDocs();
+        indexFolder();
+        searchStringInIndex();
+        removeNotExistingDocs();
+
         return true;
     }
 
-    private void removeNotExistingDocs() {
-        IndexWriter writer = null;
+    private void removeNotExistingDocs() throws IOException {
+        IndexWriter indexWriter = null;
         try {
             Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
             IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
             iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-            writer = new IndexWriter(dir, iwc);
+            indexWriter = new IndexWriter(dir, iwc);
             for (String path : documentsToRemoveFromIndex) {
-                writer.deleteDocuments(new Term(SearchFields.PATH, path));
+                indexWriter.deleteDocuments(new Term(SearchFields.PATH, path));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            Closeables.closeQuietly(indexWriter);
         }
     }
 
@@ -113,30 +101,22 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         finishCallBack.call();
     }
 
-    private void indexFolder() {
+    private void indexFolder() throws IOException {
+        boolean create = false;
+        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
+        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
+
+        if (create) {
+            // Create a new index in the directory, removing any
+            // previously indexed documents:
+            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+        } else {
+            // Add new documents to an existing index:
+            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        }
+        final IndexWriter writer = new IndexWriter(dir, iwc);
         try {
-            boolean create = false;
-            Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
-            IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
 
-            if (create) {
-                // Create a new index in the directory, removing any
-                // previously indexed documents:
-                iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-            } else {
-                // Add new documents to an existing index:
-                iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-            }
-
-            // Optional: for better indexing performance, if you
-            // are indexing many documents, increase the RAM
-            // buffer.  But if you do this, increase the max heap
-            // size to the JVM (eg add -Xmx512m or -Xmx1g):
-            //
-            // iwc.setRAMBufferSizeMB(256.0);
-
-            final IndexWriter writer = new IndexWriter(dir, iwc);
-//            indexDocs(writer, docDir);
             FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
@@ -150,26 +130,18 @@ public class SearchTask extends SwingWorker<Boolean, String> {
 
                 @Override
                 public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                    System.out.println("can't read:" + file.toString());
                     return FileVisitResult.CONTINUE;
                 }
             };
-            try {
-                System.out.println(SwingUtilities.isEventDispatchThread());
-                Files.walkFileTree(Paths.get(targetFolder), fv);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Files.walkFileTree(Paths.get(targetFolder), fv);
 
-            writer.close();
-            System.out.println("Folder indexed");
-        } catch (IOException e) {
-            System.out.println(" caught a " + e.getClass() +
-                    "\n with message: " + e.getMessage());
+        } finally {
+            Closeables.closeQuietly(writer);
         }
+
     }
 
-    private void searchStringInIndex() {
+    private void searchStringInIndex() throws IOException {
         IndexReader indexReader = null;
         try {
             indexReader = DirectoryReader.open(dir);
@@ -188,17 +160,8 @@ public class SearchTask extends SwingWorker<Boolean, String> {
                     documentsToRemoveFromIndex.add(hitDoc.get(SearchFields.PATH));
                 }
             }
-            System.out.println("Starting finished");
-        } catch (Exception e) {
-            e.fillInStackTrace();
         } finally {
-            if (indexReader != null) {
-                try {
-                    indexReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            Closeables.closeQuietly(indexReader);
         }
     }
 
@@ -242,19 +205,17 @@ public class SearchTask extends SwingWorker<Boolean, String> {
 
         if (writer.getConfig().getOpenMode() == IndexWriterConfig.OpenMode.CREATE) {
             // New index, so we just add the document (no old document can be there):
-            System.out.println("adding " + file);
             writer.addDocument(doc);
         } else {
             // Existing index (an old copy of this document may have been indexed) so
             // we use updateDocument instead to replace the old one matching the exact
             // path, if present:
-            System.out.println("updating " + file);
             writer.updateDocument(new Term(SearchFields.PATH, file.getPath()), doc);
         }
 
-        if (regexp.matcher(file.getName()).matches()){
+        if (regexp.matcher(file.getName()).matches()) {
             publish(file.getAbsolutePath());
-    }
+        }
 
     }
 }
