@@ -19,6 +19,7 @@ public class TextViewerImpl extends TextProcessor {
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private BufferedReader reader;
 
+    //should be changed only from EDT
     private boolean endOfStreamIsReached = false;
 
     /**
@@ -177,7 +178,7 @@ public class TextViewerImpl extends TextProcessor {
                     endOfStreamIsReached = Futures.getUnchecked(this);
                 }
             };
-            worker.run();
+            worker.execute();
         }
     }
 
