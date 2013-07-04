@@ -1,6 +1,8 @@
 package com.mucommander.search;
 
+import com.google.common.base.Strings;
 import com.google.common.io.Closeables;
+import com.mucommander.PlatformManager;
 import com.mucommander.utils.Callback;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -16,7 +18,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -37,7 +40,7 @@ public class SearchTask extends SwingWorker<Boolean, String> {
     private final Callback finishCallBack;
     private final Pattern regexp;
 
-    private static final String indexPath = "/Users/sstolpovskiy/muIndex/";
+    private static final File indexPath = new File(PlatformManager.getPreferencesFolder().getAbsolutePath(), "index");
     private Directory dir;
     private Collection<String> documentsToRemoveFromIndex = new ArrayList<String>();
 
@@ -50,7 +53,7 @@ public class SearchTask extends SwingWorker<Boolean, String> {
     }
 
     private String prepareRegexpString(String searchString) {
-        if (searchString != null & !searchString.isEmpty()) {
+        if (!Strings.isNullOrEmpty(searchString)) {
             return ".*" + searchString.replace("*", ".*") + ".*";
         }
         return null;
@@ -62,7 +65,10 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         if (searchString == null) {
             return false;
         }
-        dir = FSDirectory.open(new File(indexPath));
+        if (!indexPath.exists()) {
+            indexPath.mkdir();
+        }
+        dir = FSDirectory.open(new File(indexPath.getAbsolutePath()));
         searchStringInIndex();
         removeNotExistingDocs();
         indexFolder();
