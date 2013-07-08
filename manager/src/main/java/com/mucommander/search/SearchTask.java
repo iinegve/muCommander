@@ -61,7 +61,6 @@ public class SearchTask extends SwingWorker<Boolean, String> {
 
     @Override
     protected Boolean doInBackground() throws Exception {
-
         if (searchString == null) {
             return false;
         }
@@ -74,20 +73,21 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         indexFolder();
         searchStringInIndex();
         removeNotExistingDocs();
-
         return true;
     }
 
     private void removeNotExistingDocs() throws IOException {
-        IndexWriter indexWriter = null;
+        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
+        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
+        iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        IndexWriter indexWriter = new IndexWriter(dir, iwc);
         try {
-            Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
-            IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
-            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-            indexWriter = new IndexWriter(dir, iwc);
             for (String path : documentsToRemoveFromIndex) {
                 indexWriter.deleteDocuments(new Term(SearchFields.PATH, path));
             }
+            indexWriter.commit();
+        } catch (IOException ex) {
+            indexWriter.rollback();
         } finally {
             Closeables.closeQuietly(indexWriter);
         }
@@ -108,21 +108,13 @@ public class SearchTask extends SwingWorker<Boolean, String> {
     }
 
     private void indexFolder() throws IOException {
-        boolean create = false;
         Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
         IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
 
-        if (create) {
-            // Create a new index in the directory, removing any
-            // previously indexed documents:
-            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-        } else {
-            // Add new documents to an existing index:
-            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-        }
+        // Add new documents to an existing index:
+        iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         final IndexWriter writer = new IndexWriter(dir, iwc);
         try {
-
             FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
@@ -140,7 +132,9 @@ public class SearchTask extends SwingWorker<Boolean, String> {
                 }
             };
             Files.walkFileTree(Paths.get(targetFolder), fv);
-
+            writer.commit();
+        } catch (IOException ex) {
+            writer.rollback();
         } finally {
             Closeables.closeQuietly(writer);
         }

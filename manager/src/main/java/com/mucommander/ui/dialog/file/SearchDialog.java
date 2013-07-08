@@ -1,13 +1,13 @@
 package com.mucommander.ui.dialog.file;
 
-import com.mucommander.commons.file.AbstractFile;
-import com.mucommander.process.ProcessListener;
+import com.mucommander.commons.file.util.FileSet;
 import com.mucommander.search.SearchTask;
 import com.mucommander.text.Translator;
 import com.mucommander.ui.action.ActionProperties;
 import com.mucommander.ui.action.impl.SearchFilesAction;
 import com.mucommander.ui.dialog.DialogToolkit;
 import com.mucommander.ui.dialog.FocusDialog;
+import com.mucommander.ui.dialog.InformationDialog;
 import com.mucommander.ui.icon.SpinningDial;
 import com.mucommander.ui.layout.XBoxPanel;
 import com.mucommander.ui.layout.YBoxPanel;
@@ -20,20 +20,11 @@ import com.mucommander.utils.Callback;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.PrintStream;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: sstolpovskiy
- * Date: 01.07.13
- * Time: 14:20
- * To change this template use File | Settings | File Templates.
+ * @author sstolpovskiy
  */
 public class SearchDialog extends FocusDialog implements ActionListener, KeyListener, MouseListener {
 
@@ -98,8 +89,11 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
         contentPane.add(createButtonsArea(), BorderLayout.SOUTH);
 
         // Sets default items.
-        setInitialFocusComponent(folderInputField);
+        setInitialFocusComponent(searchStringInputField);
         getRootPane().setDefaultButton(runStopButton);
+
+        FileSet selectedFiles = mainFrame.getActiveTable().getSelectedFiles();
+        folderInputField.setText(selectedFiles.getBaseFolder().getAbsolutePath());
 
         // Makes sure that any running process will be killed when the dialog is closed.
         addWindowListener(new WindowAdapter() {
@@ -225,7 +219,6 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
         // No new command can be entered while a process is running.
         folderInputField.setEnabled(false);
         searchStringInputField.setEnabled(false);
-        repaint();
         currentProcess = new SearchTask(targetFolder, searchString, listModel, new Callback() {
             @Override
             public void call() {
@@ -235,7 +228,12 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
                 // No new command can be entered while a process is running.
                 folderInputField.setEnabled(true);
                 searchStringInputField.setEnabled(true);
-                repaint();
+                try {
+                    currentProcess.get();
+                } catch (ExecutionException e) {
+                    InformationDialog.showErrorDialog(SearchDialog.this, "Something Bad Happened", "Search file " + searchStringInputField.getText() + " failed", e.getMessage() + ". See exception details.", e);
+                } catch (Exception ignored) {
+                }
             }
         });
         currentProcess.execute();
@@ -243,17 +241,14 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
 
     @Override
     public void keyTyped(KeyEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -266,31 +261,24 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
                 FolderPanel folderPanel = this.mainFrame.getActivePanel();
                 File file = new File(o.toString());
                 folderPanel.tryChangeCurrentFolder(file.isDirectory() ? file.getAbsolutePath() : file.getParent());
-
                 this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             }
-
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
-
 }
