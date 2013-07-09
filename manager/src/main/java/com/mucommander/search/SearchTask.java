@@ -1,8 +1,9 @@
 package com.mucommander.search;
 
-import com.google.common.base.Strings;
 import com.google.common.io.Closeables;
 import com.mucommander.PlatformManager;
+import com.mucommander.commons.file.AbstractFile;
+import com.mucommander.commons.file.FileFactory;
 import com.mucommander.utils.Callback;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -11,7 +12,6 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.*;
-import org.apache.lucene.sandbox.queries.regex.RegexQuery;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -20,12 +20,7 @@ import org.apache.lucene.util.Version;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * Class encapsulate logic for searching and building lucene index on file system.
@@ -38,7 +33,6 @@ public class SearchTask extends SwingWorker<Boolean, String> {
     private final String searchString;
     private final DefaultListModel listModel;
     private final Callback finishCallBack;
-    private final Pattern regexp;
 
     private static final File indexPath = new File(PlatformManager.getPreferencesFolder().getAbsolutePath(), "index");
     private Directory dir;
@@ -46,17 +40,9 @@ public class SearchTask extends SwingWorker<Boolean, String> {
 
     public SearchTask(String targetFolder, String searchString, DefaultListModel defaultListModel, Callback callback) {
         this.targetFolder = targetFolder;
-        this.searchString = prepareRegexpString(searchString);
-        this.regexp = Pattern.compile(this.searchString);
+        this.searchString = searchString;
         this.listModel = defaultListModel;
         this.finishCallBack = callback;
-    }
-
-    private String prepareRegexpString(String searchString) {
-        if (!Strings.isNullOrEmpty(searchString)) {
-            return ".*" + searchString.replace("*", ".*") + ".*";
-        }
-        return null;
     }
 
     @Override
@@ -69,7 +55,6 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         }
         dir = FSDirectory.open(new File(indexPath.getAbsolutePath()));
         searchStringInIndex();
-        removeNotExistingDocs();
         indexFolder();
         searchStringInIndex();
         removeNotExistingDocs();
@@ -79,7 +64,7 @@ public class SearchTask extends SwingWorker<Boolean, String> {
     private void removeNotExistingDocs() throws IOException {
         Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
         IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
-        iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        iwc.setOpenMode(IndexWriterConfig.OpenMode.APPEND);
         IndexWriter indexWriter = new IndexWriter(dir, iwc);
         try {
             for (String path : documentsToRemoveFromIndex) {
@@ -88,6 +73,7 @@ public class SearchTask extends SwingWorker<Boolean, String> {
             indexWriter.commit();
         } catch (IOException ex) {
             indexWriter.rollback();
+            throw ex;
         } finally {
             Closeables.closeQuietly(indexWriter);
         }
@@ -107,7 +93,7 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         finishCallBack.call();
     }
 
-    private void indexFolder() throws IOException {
+    private void indexFolder() throws Exception {
         Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
         IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
 
@@ -115,30 +101,34 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
         final IndexWriter writer = new IndexWriter(dir, iwc);
         try {
-            FileVisitor<Path> fv = new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                        throws IOException {
-                    if (Thread.currentThread().isInterrupted()) {
-                        return FileVisitResult.TERMINATE;
-                    }
-                    indexDoc(writer, file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                    return FileVisitResult.CONTINUE;
-                }
-            };
-            Files.walkFileTree(Paths.get(targetFolder), fv);
+            walkBFS(FileFactory.getFile(targetFolder), writer);
             writer.commit();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             writer.rollback();
+            throw ex;
         } finally {
             Closeables.closeQuietly(writer);
         }
+    }
 
+    /**
+     * Implements the <a href="http://en.wikipedia.org/wiki/Breadth-first_search">Breadth First Search</a> algorithm.
+     */
+    private void walkBFS(AbstractFile rootFile, IndexWriter writer) throws IOException {
+        Deque<AbstractFile> taskList = new LinkedList<AbstractFile>();
+        taskList.add(rootFile);
+        while (!taskList.isEmpty()) {
+            AbstractFile file = taskList.pop();
+            if (file.isBrowsable() && !file.isHidden() && !file.isSymlink()) {
+                try {
+                    AbstractFile[] ls = file.ls();
+                    taskList.addAll(Arrays.asList(ls));
+                } catch (IOException ignored) {
+                }
+            } else {
+                indexDoc(writer, file);
+            }
+        }
     }
 
     private void searchStringInIndex() throws IOException {
@@ -152,9 +142,9 @@ public class SearchTask extends SwingWorker<Boolean, String> {
             searcher.search(query, collector);
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
             // `i` is just a number of document in Lucene. Note, that this number may change after document deletion
-            for (int i = 0; i < hits.length; i++) {
-                Document hitDoc = searcher.doc(hits[i].doc);  // getting actual document
-                if (new File(hitDoc.get(SearchFields.PATH)).exists()) {
+            for (ScoreDoc hit : hits) {
+                Document hitDoc = searcher.doc(hit.doc);  // getting actual document
+                if (FileFactory.getFile(hitDoc.get(SearchFields.PATH)).exists()) {
                     publish(hitDoc.get(SearchFields.PATH));
                 } else {
                     documentsToRemoveFromIndex.add(hitDoc.get(SearchFields.PATH));
@@ -167,15 +157,14 @@ public class SearchTask extends SwingWorker<Boolean, String> {
 
     private BooleanQuery getQuery() {
         BooleanQuery query = new BooleanQuery();
-        query.add(new RegexQuery(new Term(SearchFields.FILE_NAME, searchString)), BooleanClause.Occur.MUST);
+        query.add(new WildcardQuery(new Term(SearchFields.FILE_NAME, searchString)), BooleanClause.Occur.MUST);
         query.add(new PrefixQuery(new Term(SearchFields.PATH, targetFolder)), BooleanClause.Occur.MUST);
         return query;
     }
 
 
-    private void indexDoc(IndexWriter writer, Path path) throws IOException {
+    private void indexDoc(IndexWriter writer, AbstractFile file) throws IOException {
 
-        File file = path.toFile();
         // make a new, empty document
         Document doc = new Document();
         // Add the path of the file as a field named "path".  Use a
@@ -195,7 +184,7 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         // year/month/day/hour/minutes/seconds, down the resolution you require.
         // For example the long value 2011021714 would mean
         // February 17, 2011, 2-3 PM.
-        doc.add(new LongField("modified", file.lastModified(), Field.Store.NO));
+        doc.add(new LongField("modified", file.getDate(), Field.Store.NO));
 
         // Add the contents of the file to a field named "contents".  Specify a Reader,
         // so that the text of the file is tokenized and indexed, but not stored.
@@ -212,10 +201,5 @@ public class SearchTask extends SwingWorker<Boolean, String> {
             // path, if present:
             writer.updateDocument(new Term(SearchFields.PATH, file.getPath()), doc);
         }
-
-        if (regexp.matcher(file.getName()).matches()) {
-            publish(file.getAbsolutePath());
-        }
-
     }
 }
