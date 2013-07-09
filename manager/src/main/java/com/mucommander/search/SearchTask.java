@@ -54,6 +54,11 @@ public class SearchTask extends SwingWorker<Boolean, String> {
             indexPath.mkdir();
         }
         dir = FSDirectory.open(new File(indexPath.getAbsolutePath()));
+        if (!DirectoryReader.indexExists(dir)){
+            IndexWriter index = new IndexWriter(dir, new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_43)));
+            index.commit();
+            index.close();
+        }
         searchStringInIndex();
         indexFolder();
         searchStringInIndex();
