@@ -36,11 +36,12 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
     private MainFrame mainFrame;
 
     /**
-     * Editable combo box used for shell input and history.
+     * Text field used for input search directory.
      */
     private JTextField folderInputField;
+
     /**
-     * Editable combo box used for shell input and history.
+     * Text field used for search string input.
      */
     private JTextField searchStringInputField;
 
@@ -52,10 +53,6 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
      * Cancel button.
      */
     private JButton cancelButton;
-    /**
-     * Clear shell history button.
-     */
-    private JButton clearButton;
 
     /**
      * Text area used to display the shell output.
@@ -78,7 +75,6 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
     private SearchTask currentProcess;
     private DefaultListModel listModel;
 
-
     public SearchDialog(MainFrame mainFrame) {
         super(mainFrame, ActionProperties.getActionLabel(SearchFilesAction.Descriptor.ACTION_ID), mainFrame);
         this.mainFrame = mainFrame;
@@ -94,6 +90,7 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
 
         FileSet selectedFiles = mainFrame.getActiveTable().getSelectedFiles();
         folderInputField.setText(selectedFiles.getBaseFolder().getAbsolutePath());
+        searchStringInputField.setText("*.*");
 
         // Makes sure that any running process will be killed when the dialog is closed.
         addWindowListener(new WindowAdapter() {
@@ -171,18 +168,19 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
         buttonsPanel = new XBoxPanel();
 
         // 'Clear history' button.
-        buttonsPanel.add(clearButton = new JButton(Translator.get("run_dialog.clear_history")));
-        clearButton.addActionListener(this);
+        JLabel statusLabel = new JLabel();
+        buttonsPanel.add(statusLabel);
 
         // Separator.
         buttonsPanel.add(Box.createHorizontalGlue());
 
         // 'Run / stop' and 'Cancel' buttons.
         buttonsPanel.add(DialogToolkit.createOKCancelPanel(
-                runStopButton = new JButton(Translator.get("run_dialog.run")),
+                runStopButton = new JButton(Translator.get("search_dialog.do_search")),
                 cancelButton = new JButton(Translator.get("cancel")),
                 getRootPane(),
                 this));
+
 
         return buttonsPanel;
     }
@@ -190,15 +188,7 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == clearButton) {
-            if (currentProcess != null) {
-                currentProcess.cancel(true);
-            }
-            dial.setAnimated(false);
-            listModel.clear();
-            outputTextArea.requestFocus();
-            repaint();
-        } else if (source == runStopButton) {
+        if (source == runStopButton) {
             runSearchTask(folderInputField.getText(), searchStringInputField.getText());
         } else if (source == cancelButton) {
             if (currentProcess != null) {
@@ -233,6 +223,7 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
                 } catch (ExecutionException e) {
                     InformationDialog.showErrorDialog(SearchDialog.this, "Something Bad Happened", "Search file " + searchStringInputField.getText() + " failed", e.getMessage() + ". See exception details.", e);
                 } catch (Exception ignored) {
+                    //interrupted should be here
                 }
             }
         });

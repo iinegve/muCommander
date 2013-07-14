@@ -1,6 +1,5 @@
 package com.mucommander.ui.action.impl;
 
-
 import com.mucommander.ui.action.*;
 import com.mucommander.ui.dialog.file.SearchDialog;
 import com.mucommander.ui.main.MainFrame;
@@ -49,6 +48,6 @@ public class SearchFilesAction extends MuAction implements InvokesDialog {
 
         public KeyStroke getDefaultAltKeyStroke() { return null; }
 
-        public KeyStroke getDefaultKeyStroke() { return KeyStroke.getKeyStroke(KeyEvent.VK_F7, KeyEvent.ALT_DOWN_MASK); }
+        public KeyStroke getDefaultKeyStroke() { return KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK); }
     }
 }
