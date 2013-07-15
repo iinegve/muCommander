@@ -125,10 +125,12 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         while (!taskList.isEmpty()) {
             AbstractFile file = taskList.pop();
             if (file.isBrowsable() && !file.isHidden() && !file.isSymlink()) {
+                indexDoc(writer, file);
                 try {
                     AbstractFile[] ls = file.ls();
                     taskList.addAll(Arrays.asList(ls));
                 } catch (IOException ignored) {
+                    //broken channel or archive error can occur
                 }
             } else {
                 indexDoc(writer, file);
