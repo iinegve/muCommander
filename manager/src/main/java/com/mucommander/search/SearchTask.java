@@ -185,10 +185,10 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         // field that is indexed (i.e. searchable), but don't tokenize
         // the field into separate words and don't index term frequency
         // or positional information:
-        Field pathField = new StringField(SearchFields.PATH, file.getAbsolutePath(), Field.Store.NO);
+        Field pathField = new StringField(SearchFields.PATH, file.getAbsolutePath(), Field.Store.YES);
         doc.add(pathField);
 
-        Field fileName = new StringField(SearchFields.FILE_NAME, file.getName(), Field.Store.NO);
+        Field fileName = new StringField(SearchFields.FILE_NAME, file.getName(), Field.Store.YES);
         doc.add(fileName);
 
         // Add the last modified date of the file a field named "modified".
