@@ -54,13 +54,16 @@ public class SearchTask extends SwingWorker<Boolean, String> {
             indexPath.mkdir();
         }
         dir = FSDirectory.open(new File(indexPath.getAbsolutePath()));
-        if (!DirectoryReader.indexExists(dir)){
+        if (!DirectoryReader.indexExists(dir)) {
             IndexWriter index = new IndexWriter(dir, new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_43)));
             index.commit();
             index.close();
         }
         searchStringInIndex();
         indexFolder();
+        if (isCancelled()) {
+            return false;
+        }
         searchStringInIndex();
         removeNotExistingDocs();
         return true;
@@ -109,7 +112,11 @@ public class SearchTask extends SwingWorker<Boolean, String> {
             walkBFS(FileFactory.getFile(targetFolder), writer);
             writer.commit();
         } catch (Exception ex) {
-            writer.rollback();
+            try {
+                writer.commit();
+            } catch (Exception e) {
+                writer.rollback();
+            }
             throw ex;
         } finally {
             Closeables.closeQuietly(writer);
@@ -122,7 +129,7 @@ public class SearchTask extends SwingWorker<Boolean, String> {
     private void walkBFS(AbstractFile rootFile, IndexWriter writer) throws IOException {
         Deque<AbstractFile> taskList = new LinkedList<AbstractFile>();
         taskList.add(rootFile);
-        while (!taskList.isEmpty()) {
+        while (!taskList.isEmpty() && !isCancelled()) {
             AbstractFile file = taskList.pop();
             if (file.isBrowsable() && !file.isHidden() && !file.isSymlink()) {
                 indexDoc(writer, file);
@@ -178,10 +185,10 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         // field that is indexed (i.e. searchable), but don't tokenize
         // the field into separate words and don't index term frequency
         // or positional information:
-        Field pathField = new StringField(SearchFields.PATH, file.getAbsolutePath(), Field.Store.YES);
+        Field pathField = new StringField(SearchFields.PATH, file.getAbsolutePath(), Field.Store.NO);
         doc.add(pathField);
 
-        Field fileName = new StringField(SearchFields.FILE_NAME, file.getName(), Field.Store.YES);
+        Field fileName = new StringField(SearchFields.FILE_NAME, file.getName(), Field.Store.NO);
         doc.add(fileName);
 
         // Add the last modified date of the file a field named "modified".
@@ -191,7 +198,7 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         // year/month/day/hour/minutes/seconds, down the resolution you require.
         // For example the long value 2011021714 would mean
         // February 17, 2011, 2-3 PM.
-        doc.add(new LongField("modified", file.getDate(), Field.Store.NO));
+        //doc.add(new LongField("modified", file.getDate(), Field.Store.NO));
 
         // Add the contents of the file to a field named "contents".  Specify a Reader,
         // so that the text of the file is tokenized and indexed, but not stored.

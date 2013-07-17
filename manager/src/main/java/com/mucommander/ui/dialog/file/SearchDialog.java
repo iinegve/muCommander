@@ -115,10 +115,10 @@ public class SearchDialog extends FocusDialog implements ActionListener, KeyList
         YBoxPanel mainPanel;
 
         mainPanel = new YBoxPanel();
-
+        mainPanel.add(new JLabel(Translator.get("search_dialog.folder_label")));
         mainPanel.add(folderInputField = new JTextField());
         folderInputField.setEnabled(true);
-
+        mainPanel.add(new JLabel(Translator.get("search_dialog.file_label")));
         mainPanel.add(searchStringInputField = new JTextField());
         searchStringInputField.setEnabled(true);
 
