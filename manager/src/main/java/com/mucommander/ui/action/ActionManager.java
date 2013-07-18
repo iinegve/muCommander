@@ -168,6 +168,7 @@ public class ActionManager {
     	registerAction(new RevealInDesktopAction.Descriptor(),              new RevealInDesktopAction.Factory());
     	registerAction(new ReverseSortOrderAction.Descriptor(),             new ReverseSortOrderAction.Factory());
     	registerAction(new RunCommandAction.Descriptor(),     		        new RunCommandAction.Factory());
+        registerAction(new SearchFilesAction.Descriptor(), new SearchFilesAction.Factory());
         registerAction(new SelectPreviousBlockAction.Descriptor(),          new SelectPreviousBlockAction.Factory());
         registerAction(new SelectPreviousPageAction.Descriptor(),           new SelectPreviousPageAction.Factory());
         registerAction(new SelectPreviousRowAction.Descriptor(),            new SelectPreviousRowAction.Factory());
