@@ -9,7 +9,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.*;
 import org.apache.lucene.search.*;
@@ -130,12 +129,21 @@ public class SearchTask extends SwingWorker<Boolean, String> {
         Deque<AbstractFile> taskList = new LinkedList<AbstractFile>();
         taskList.add(rootFile);
         while (!taskList.isEmpty() && !isCancelled()) {
-            AbstractFile file = taskList.pop();
+            AbstractFile file = taskList.pollLast();
             if (file.isBrowsable() && !file.isHidden() && !file.isSymlink()) {
                 indexDoc(writer, file);
                 try {
                     AbstractFile[] ls = file.ls();
-                    taskList.addAll(Arrays.asList(ls));
+                    for (int i = 0; i < ls.length; i++) {
+                        AbstractFile l = ls[i];
+                        //{@link com.mucommander.commons.file.AbstractArchiveFile#ls} may return itself!
+                        if (!file.equals(l)) {
+                            taskList.addLast(l);
+                        }
+                    }
+                } catch (NullPointerException ignored) {
+                    //com.github.junrar.Archive setFile
+                    //exception in archive constructor maybe file is encrypted or currupt
                 } catch (IOException ignored) {
                     //broken channel or archive error can occur
                 }
