@@ -11714,6 +11714,19 @@ change_date_dialog.specific_date:TR:Özel tarih
 change_date_dialog.specific_date:CA:Data concreta
 
 
+#################
+# Search dialog #
+#################
+
+search_dialog.do_search:EN:Find
+search_dialog.do_search:RU:Найти
+search_dialog.folder_label:EN:Search in
+search_dialog.folder_label:RU:Искать в
+search_dialog.file_label:EN:Search for
+search_dialog.file_label:RU:Искать что
+SearchFilesCommand.label:EN:Find In Path
+SearchFilesCommand.label:RU:Поиск в каталоге
+
 ##############
 # Run dialog #
 ##############

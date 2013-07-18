@@ -19,6 +19,7 @@
         <hadoop.common.version>2.0.0-cdh4.1.1</hadoop.common.version>
         <guava.version>11.0.2</guava.version>
         <protobuf.version>2.4.1</protobuf.version>
+        <lucene.version>4.3.1</lucene.version>
     </properties>
 
     <dependencies>
@@ -66,6 +67,22 @@
             <groupId>com.mucommander.commons</groupId>
             <artifactId>runtime</artifactId>
             <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
 
         <dependency>
