@@ -241,6 +241,8 @@
     </dependencies>
 
     <build>
+        <finalName>muCommander-${project.version}</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -283,38 +285,24 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.6</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>osxappbundle-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <configuration>
+                    <bundleName>muCommander</bundleName>
+                    <mainClass>com.mucommander.Launcher</mainClass>
+                    <iconFile>src/main/resources/icon.icns</iconFile>
+                    <jvmVersion>1.6+</jvmVersion>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>bundle</goal>
                         </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <!--<plugin>-->
-            <!--<artifactId>maven-antrun-plugin</artifactId>-->
-            <!--<version>1.7</version>-->
-            <!--<configuration>-->
-            <!--<target>-->
-            <!--<echo>Blah blah</echo>-->
-            <!--<ant antfile="${basedir}/build.xml">-->
-            <!--<target name="release"/>-->
-            <!--</ant>-->
-            <!--</target>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
         </plugins>
     </build>
 </project>
