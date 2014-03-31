@@ -123,9 +123,11 @@ public class TextViewerImpl extends TextProcessor {
 
         reader = new BufferedReader(new InputStreamReader(input, encoding), 8192);
         final int rowsToRead = calcHeightInRows();
-        readRows(rowsToRead == 0 ? 50 : rowsToRead); //read first 50 lines at the beginning
+        readRows(rowsToRead == 0 ? 25 : rowsToRead); //read first 25 lines at the beginning
 
-        textArea.setCaretPosition(0); // Move cursor to the top
+        textArea.setCaretPosition(0); // Moves cursor to the top (doesn't work)
+        // JComponent initialization starts further, thus all changes of UI here
+        // won't have any effect
     }
 
     /**

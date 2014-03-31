@@ -19,6 +19,7 @@
 package com.mucommander.ui.layout;
 
 import com.mucommander.text.Translator;
+import com.mucommander.ui.icon.SpinningDial;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -121,7 +122,7 @@ public abstract class AsyncPanel extends JPanel {
      */
     public static JComponent getDefaultWaitComponent() {
         JLabel label = new JLabel(Translator.get("loading"));
-//        label.setIcon(new SpinningDial(24, 24, true));
+        label.setIcon(new SpinningDial(24, 24, true));
 
         // Center the label both horizontally and vertically
         JPanel tempPanel = new JPanel(new GridBagLayout());
