@@ -23,6 +23,7 @@ import com.mucommander.commons.file.*;
 import com.mucommander.commons.io.RandomAccessInputStream;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
+import org.jets3t.service.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +96,7 @@ public class S3Bucket extends S3File {
         try {
             service.deleteBucket(bucketName);
         }
-        catch(S3ServiceException e) {
+        catch(ServiceException e) {
             throw getIOException(e);
         }
     }

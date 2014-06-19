@@ -26,7 +26,10 @@ import com.mucommander.commons.io.RandomAccessInputStream;
 import com.mucommander.commons.io.StreamUtils;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
+import org.jets3t.service.ServiceException;
 import org.jets3t.service.model.S3Owner;
+import org.jets3t.service.model.StorageObject;
+import org.jets3t.service.model.StorageOwner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,7 +180,7 @@ public class S3Object extends S3File {
             atts.setDirectory(false);
             atts.setSize(0);
         }
-        catch(S3ServiceException e) {
+        catch(ServiceException e) {
             throw getIOException(e);
         }
     }
@@ -216,7 +219,7 @@ public class S3Object extends S3File {
             destObjectFile.atts.setAttributes(destObject);
             destObjectFile.atts.setExists(true);
         }
-        catch(S3ServiceException e) {
+        catch(ServiceException e) {
             throw getIOException(e);
         }
     }
@@ -233,7 +236,7 @@ public class S3Object extends S3File {
             // add unnecessary billing overhead since it reads the object chunk by chunk, each in a separate GET request.
             return service.getObject(bucketName, getObjectKey(false), null, null, null, null, offset==0?null:offset, null).getDataInputStream();
         }
-        catch(S3ServiceException e) {
+        catch(ServiceException e) {
             throw getIOException(e);
         }
     }
@@ -452,7 +455,7 @@ public class S3Object extends S3File {
                         .getDataInputStream();
                     this.offset = offset;
                 }
-                catch(S3ServiceException e) {
+                catch(ServiceException e) {
                     throw getIOException(e);
                 }
             }
@@ -607,13 +610,13 @@ public class S3Object extends S3File {
             updateExpirationDate(); // declare the attributes as 'fresh'
         }
 
-        private void setAttributes(org.jets3t.service.model.S3Object object) {
+        private void setAttributes(StorageObject object) {
             setDirectory(object.getKey().endsWith("/"));
             setSize(object.getContentLength());
             setDate(object.getLastModifiedDate().getTime());
             setPermissions(DEFAULT_PERMISSIONS);
             // Note: owner is null for common prefix objects
-            S3Owner owner = object.getOwner();
+            StorageOwner owner = object.getOwner();
             setOwner(owner==null?null:owner.getDisplayName());
         }
 
@@ -623,7 +626,7 @@ public class S3Object extends S3File {
                 // Object does not exist on the server
                 setExists(true);
             }
-            catch(S3ServiceException e) {
+            catch(ServiceException e) {
                 // Object does not exist on the server, or could not be retrieved
                 setExists(false);
 

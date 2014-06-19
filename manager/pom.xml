@@ -292,7 +292,7 @@
                     <bundleName>muCommander</bundleName>
                     <mainClass>com.mucommander.Launcher</mainClass>
                     <iconFile>src/main/resources/icon.icns</iconFile>
-                    <jvmVersion>1.6+</jvmVersion>
+                    <jvmVersion>1.7</jvmVersion>
                 </configuration>
                 <executions>
                     <execution>
