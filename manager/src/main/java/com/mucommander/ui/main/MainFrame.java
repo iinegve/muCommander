@@ -28,6 +28,7 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Method;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
@@ -37,7 +38,6 @@ import javax.swing.JSplitPane;
 import javax.swing.WindowConstants;
 import javax.swing.table.TableColumnModel;
 
-import com.apple.eawt.FullScreenUtilities;
 import com.mucommander.commons.file.AbstractArchiveEntryFile;
 import com.mucommander.commons.file.AbstractFile;
 import com.mucommander.commons.file.FileProtocols;
@@ -156,7 +156,14 @@ public class MainFrame extends JFrame implements LocationListener {
 
         if (OsFamilies.MAC_OS_X.isCurrent()) {
         	// Lion Fullscreen support
-        	FullScreenUtilities.setWindowCanFullScreen(this, true);
+            try {
+                Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+                Class params[] = new Class[]{Window.class, Boolean.TYPE};
+                Method method = util.getMethod("setWindowCanFullScreen", params);
+                method.invoke(null, this, true);
+            } catch (ClassNotFoundException ignored) {
+            } catch (Exception ignored) {
+            }
         }
 
         // Enable window resize
