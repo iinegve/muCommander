@@ -24,6 +24,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.simplericity.macify</groupId>
+            <artifactId>macify</artifactId>
+            <version>1.6</version>
+        </dependency>
+
+        <dependency>
             <!-- Dirty hack: there is no place to download it from -->
             <groupId>yanfs</groupId>
             <artifactId>yanfs</artifactId>
@@ -265,6 +271,25 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <finalName>mucommander</finalName>
@@ -292,7 +317,7 @@
                     <bundleName>muCommander</bundleName>
                     <mainClass>com.mucommander.Launcher</mainClass>
                     <iconFile>src/main/resources/icon.icns</iconFile>
-                    <jvmVersion>1.7</jvmVersion>
+                    <jvmVersion>1.6+</jvmVersion>
                 </configuration>
                 <executions>
                     <execution>
