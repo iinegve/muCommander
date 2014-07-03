@@ -247,7 +247,7 @@
     </dependencies>
 
     <build>
-        <finalName>muCommander-${project.version}</finalName>
+        <!--<finalName>muCommander-${project.version}</finalName>-->
 
         <plugins>
             <plugin>
@@ -292,7 +292,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <finalName>mucommander</finalName>
+                    <!--<finalName>mucommander</finalName>-->
                     <archive>
                         <manifest>
                             <mainClass>com.mucommander.Launcher</mainClass>
@@ -310,6 +310,26 @@
             </plugin>
 
             <plugin>
+                <groupId>io.github.appbundler</groupId>
+                <artifactId>appbundle-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <configuration>
+                    <bundleName>muCommander</bundleName>
+                    <mainClass>com.mucommander.Launcher</mainClass>
+                    <iconFile>src/main/resources/icon.icns</iconFile>
+                    <jvmVersion>1.7+</jvmVersion>
+                </configuration>
+                <!--<executions>-->
+                <!--<execution>-->
+                <!--<phase>package</phase>-->
+                <!--<goals>-->
+                <!--<goal>bundle</goal>-->
+                <!--</goals>-->
+                <!--</execution>-->
+                <!--</executions>-->
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>osxappbundle-maven-plugin</artifactId>
                 <version>1.0-alpha-2</version>
@@ -317,17 +337,17 @@
                     <bundleName>muCommander</bundleName>
                     <mainClass>com.mucommander.Launcher</mainClass>
                     <iconFile>src/main/resources/icon.icns</iconFile>
-                    <jvmVersion>1.6+</jvmVersion>
+                    <jvmVersion>1.7+</jvmVersion>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+                <!--<executions>-->
+                <!--<execution>-->
+                <!--<phase>package</phase>-->
+                <!--<goals>-->
+                <!--<goal>bundle</goal>-->
+                <!--</goals>-->
+                <!--</execution>-->
+                <!--</executions>-->
+                </plugin>
         </plugins>
     </build>
 </project>

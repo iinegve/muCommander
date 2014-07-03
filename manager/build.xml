@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="muCommander" default="bundle">
+    <property environment="env" />
+
+    <taskdef 
+        name="bundleapp" 
+        classname="com.oracle.appbundler.AppBundlerTask" 
+        classpath="lib/appbundler-1.0.jar" />
+
+    <target name="bundle">
+        <bundleapp 
+            outputdirectory="target" 
+            name="muCommander" 
+            displayname="muCommander" 
+            identifier="muCommander.identifier" 
+            shortversion="0.9.1-SNAPSHOT"
+            applicationCategory="public.app-category.developer-tools"
+            mainclassname="com.mucommander.Launcher"
+            icon="target/classes/icon.icns">
+            <classpath dir="target/lib"/>
+            <classpath file="target/manager*.jar"/>
+        </bundleapp>
+    </target>
+</project>
