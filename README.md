@@ -21,7 +21,8 @@ To get runnable version the one must
 
 * run mvn clean install* 
 * in ./manager/target directory run manager-{version}.jar (it uses target/lib folder)
-* run ant bundle (can get standalone app)
+* run **ant bundle** (can get standalone app)
+* run **com.mucommander.Launcher** in eclipse to debug
 
 ===========
 

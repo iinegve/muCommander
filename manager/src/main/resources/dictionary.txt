@@ -15564,6 +15564,33 @@ prefs_dialog.show_hidden_files:NB:Vis skjulte filer
 prefs_dialog.show_hidden_files:TR:Gizli dosyaları göster
 prefs_dialog.show_hidden_files:CA:Mostrar fitxers ocults
 
+prefs_dialog.case_insensitive_quick_search:EN:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:FR:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:DE:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:ES:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:CS:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:zh_TW:快速搜索忽略大小写
+prefs_dialog.case_insensitive_quick_search:PL:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:HU:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:RU:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:zh_CN:快速搜索忽略大小写
+prefs_dialog.case_insensitive_quick_search:SL:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:IU:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:RO:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:KO:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:pt_BR:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:NL:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:SK:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:JA:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:SV:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:UA:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:AR:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:BE:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:NB:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:TR:Case Insensitive Of Quick Search
+prefs_dialog.case_insensitive_quick_search:CA:Case Insensitive Of Quick Search
+
+
 # Note: .DS_Store files are Mac OS X specific files which are used by the Finder to store information on how a folder should be displayed
 prefs_dialog.show_ds_store_files:EN:Show .DS_Store files
 prefs_dialog.show_ds_store_files:FR:Afficher les fichiers .DS_Store

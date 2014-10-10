@@ -200,6 +200,10 @@ public class MuPreferences implements MuPreferencesAPI {
 	public static final String  LEFT                               = "left";
 	/** Identifier of the right file table. */
 	public static final String  RIGHT                              = "right";
+	/** Whether or not to ignore case sensitive in quick search*/
+	public static final String  CASE_INSENSITIVE_QSEARCH           = FILE_TABLE_SECTION + '.' + "case_insensitive_quick_search";
+	/** Default is case sensitive quick search*/
+	public static final boolean DEFAULT_CASE_INSENSITIVE_QSEARCH   = false;
 	/** Whether or not to display hidden files. */
 	public static final String  SHOW_HIDDEN_FILES                  = FILE_TABLE_SECTION + '.' + "show_hidden_files";
 	/** Default hidden files visibility. */
