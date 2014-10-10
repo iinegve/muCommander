@@ -9235,6 +9235,57 @@ pack_dialog.archive_format:NB:Arkivformat
 pack_dialog.archive_format:TR:Arşiv biçimi
 pack_dialog.archive_format:CA:Format del fitxer
 
+pack_dialog.ignore_parent_folder:EN:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:FR:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:DE:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:ES:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:CS:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:zh_TW:忽略父目录
+pack_dialog.ignore_parent_folder:PL:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:HU:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:RU:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:zh_TW:忽略父目录
+pack_dialog.ignore_parent_folder:SL:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:IU:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:RO:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:KO:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:pt_BR:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:NL:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:SK:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:JA:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:SV:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:UA:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:AR:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:BE:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:NB:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:TR:Ignore Parent Folder
+pack_dialog.ignore_parent_folder:CA:Ignore Parent Folder
+
+pack_dialog.pack_into_selected_folder:EN:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:FR:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:DE:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:ES:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:CS:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:zh_TW:压缩到所选目录内部
+pack_dialog.pack_into_selected_folder:PL:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:HU:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:RU:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:zh_TW:压缩到所选目录内部
+pack_dialog.pack_into_selected_folder:SL:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:IU:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:RO:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:KO:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:pt_BR:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:NL:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:SK:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:JA:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:SV:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:UA:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:AR:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:BE:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:NB:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:TR:Pack Into Selected Folder
+pack_dialog.pack_into_selected_folder:CA:Pack Into Selected Folder
 
 ##########
 # Unpack #
@@ -15589,7 +15640,6 @@ prefs_dialog.case_insensitive_quick_search:BE:Case Insensitive Of Quick Search
 prefs_dialog.case_insensitive_quick_search:NB:Case Insensitive Of Quick Search
 prefs_dialog.case_insensitive_quick_search:TR:Case Insensitive Of Quick Search
 prefs_dialog.case_insensitive_quick_search:CA:Case Insensitive Of Quick Search
-
 
 # Note: .DS_Store files are Mac OS X specific files which are used by the Finder to store information on how a folder should be displayed
 prefs_dialog.show_ds_store_files:EN:Show .DS_Store files
