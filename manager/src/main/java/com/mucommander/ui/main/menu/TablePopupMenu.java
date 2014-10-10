@@ -96,6 +96,10 @@ public class TablePopupMenu extends MuActionsPopupMenu {
         addAction(com.mucommander.ui.action.impl.UnmarkAllAction.Descriptor.ACTION_ID);
         addAction(com.mucommander.ui.action.impl.MarkSelectedFileAction.Descriptor.ACTION_ID);
 
+        //Create dir and file
+        addAction(com.mucommander.ui.action.impl.MkdirAction.Descriptor.ACTION_ID);
+        addAction(com.mucommander.ui.action.impl.MkfileAction.Descriptor.ACTION_ID);
+        
         add(new JSeparator());
 
         // 'Rename' displayed if a single file was clicked
