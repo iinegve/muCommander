@@ -93,6 +93,7 @@ public class TablePopupMenu extends MuActionsPopupMenu {
             
             //add pack action
             addAction(com.mucommander.ui.action.impl.PackAction.Descriptor.ACTION_ID);
+            addAction(com.mucommander.ui.action.impl.UnpackAction.Descriptor.ACTION_ID);
             
             add(new JSeparator());
         }
