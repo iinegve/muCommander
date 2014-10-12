@@ -22,6 +22,7 @@ package com.mucommander.ui.dialog.file;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -75,6 +76,13 @@ public class MkdirDialog extends FocusDialog implements ActionListener, ItemList
     private final static Dimension MINIMUM_DIALOG_DIMENSION = new Dimension(320,0);	
     // Dialog width should not exceed 360, height is not an issue (always the same)
     private final static Dimension MAXIMUM_DIALOG_DIMENSION = new Dimension(400,10000);
+    
+    private JCheckBox convertWhiteSpaceCheckBox;
+    /**
+     * As a developer, it is annoy to meet with Folder name that contains whitespace
+     * 
+     */
+    private boolean isConvertWhitespace;
 
 
     /**
@@ -125,6 +133,19 @@ public class MkdirDialog extends FocusDialog implements ActionListener, ItemList
             mainPanel.add(tempPanel);
         }
         
+        JPanel convertWhitespacePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        convertWhitespacePanel.add(new JLabel(Translator.get("mkfile_dialog.convert_whitespace")));
+        this.convertWhiteSpaceCheckBox = new JCheckBox();
+        convertWhiteSpaceCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				isConvertWhitespace = convertWhiteSpaceCheckBox.isSelected();
+			}
+        	
+        });
+        convertWhitespacePanel.add(convertWhiteSpaceCheckBox);
+        mainPanel.add(convertWhitespacePanel);
+        
         mainPanel.addSpace(10);
         contentPane.add(mainPanel, BorderLayout.NORTH);
         
@@ -146,6 +167,9 @@ public class MkdirDialog extends FocusDialog implements ActionListener, ItemList
      */
     public void startJob() {
         String enteredPath = pathField.getText();
+        if (isConvertWhitespace) {
+        	enteredPath = enteredPath.replaceAll(" ", "_");
+        }
 
         // Resolves destination folder
         PathUtils.ResolvedDestination resolvedDest = PathUtils.resolveDestination(enteredPath, mainFrame.getActivePanel().getCurrentFolder());

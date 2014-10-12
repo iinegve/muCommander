@@ -9723,6 +9723,31 @@ mkfile_dialog.allocate_space:BE:Вылучыць прастору
 mkfile_dialog.allocate_space:NB:Tildel plass
 mkfile_dialog.allocate_space:TR:Disk alanını ayır
 mkfile_dialog.allocate_space:CA:Mida
+
+mkfile_dialog.convert_whitespace:EN:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:FR:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:PL:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:HU:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:RU:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:DE:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:JA:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:CS:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:NL:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:RO:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:ES:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:zh_TW:空格转成下划线
+mkfile_dialog.convert_whitespace:IT:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:pt_BR:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:DA:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:SV:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:UA:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:AR:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:SK:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:zh_CN:空格转成下划线
+mkfile_dialog.convert_whitespace:BE:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:NB:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:TR:Convert whitespace to underscore
+mkfile_dialog.convert_whitespace:CA:Convert whitespace to underscore
 # Translation missing (KO, SL)
 
 
