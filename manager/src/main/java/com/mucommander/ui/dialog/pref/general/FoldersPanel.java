@@ -74,6 +74,9 @@ class FoldersPanel extends PreferencesPanel implements ItemListener, KeyListener
     private PrefFilePathFieldWithDefaultValue rightCustomFolderTextField;
 	private JButton rightCustomFolderButton;
 
+	//case insensitive quick search
+	private PrefCheckBox caseInsensitiveQuickSearchBox;
+	
     // Show hidden files?
     private PrefCheckBox showHiddenFilesCheckBox;
 
@@ -185,8 +188,16 @@ class FoldersPanel extends PreferencesPanel implements ItemListener, KeyListener
 
         YBoxPanel northPanel = new YBoxPanel();
         northPanel.add(startupFolderPanel);
-        northPanel.addSpace(5);
+        northPanel.addSpace(6);
 		
+        caseInsensitiveQuickSearchBox = new PrefCheckBox(Translator.get("prefs_dialog.case_insensitive_quick_search")) {
+			public boolean hasChanged() {
+				return isSelected() != MuConfigurations.getPreferences().getVariable(MuPreference.CASE_INSENSITIVE_QSEARCH, MuPreferences.DEFAULT_CASE_INSENSITIVE_QSEARCH);
+			} 
+        };
+        caseInsensitiveQuickSearchBox.setSelected(MuConfigurations.getPreferences().getVariable(MuPreference.CASE_INSENSITIVE_QSEARCH, MuPreferences.DEFAULT_CASE_INSENSITIVE_QSEARCH));
+        northPanel.add(caseInsensitiveQuickSearchBox);
+        
         showHiddenFilesCheckBox = new PrefCheckBox(Translator.get("prefs_dialog.show_hidden_files")){
 			public boolean hasChanged() {
 				return isSelected() != MuConfigurations.getPreferences().getVariable(MuPreference.SHOW_HIDDEN_FILES, MuPreferences.DEFAULT_SHOW_HIDDEN_FILES);
@@ -255,6 +266,7 @@ class FoldersPanel extends PreferencesPanel implements ItemListener, KeyListener
         customFoldersRadioButton.addDialogListener(parent);
         rightCustomFolderTextField.addDialogListener(parent);
         leftCustomFolderTextField.addDialogListener(parent);
+        caseInsensitiveQuickSearchBox.addDialogListener(parent);
         showHiddenFilesCheckBox.addDialogListener(parent);
         compactSizeCheckBox.addDialogListener(parent);
         followSymlinksCheckBox.addDialogListener(parent);
@@ -290,6 +302,8 @@ class FoldersPanel extends PreferencesPanel implements ItemListener, KeyListener
     	MuConfigurations.getPreferences().setVariable(MuPreference.CD_FOLLOWS_SYMLINKS, followSymlinksCheckBox.isSelected());
     	
     	MuConfigurations.getPreferences().setVariable(MuPreference.SHOW_TAB_HEADER, showTabHeaderCheckBox.isSelected());
+
+    	MuConfigurations.getPreferences().setVariable(MuPreference.CASE_INSENSITIVE_QSEARCH, caseInsensitiveQuickSearchBox.isSelected());
 
         // If one of the show/hide file filters have changed, refresh current folders of current MainFrame
         boolean refreshFolders = MuConfigurations.getPreferences().setVariable(MuPreference.SHOW_HIDDEN_FILES, showHiddenFilesCheckBox.isSelected());

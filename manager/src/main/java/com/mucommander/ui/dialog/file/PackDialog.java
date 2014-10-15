@@ -22,7 +22,9 @@ package com.mucommander.ui.dialog.file;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,6 +56,16 @@ public class PackDialog extends TransferDestinationDialog implements ItemListene
     private JComboBox formatsComboBox;
     private int formats[];
 	
+    /**
+     * The checkbox indcate to ignore current folder
+     * This option is only enable where user select one folder.
+     */
+    private JCheckBox ignoreParentFolderBox;
+    
+    private JCheckBox packIntoSelectedFolderBox;
+    
+    private boolean ignoreParentFolder;
+    
     private JTextArea commentArea;
 
     /** Used to keep track of the last selected archive format. */
@@ -61,7 +73,6 @@ public class PackDialog extends TransferDestinationDialog implements ItemListene
 
     /** Last archive format used (Zip initially), selected by default when this dialog is created */
     private static int lastFormat = Archiver.ZIP_FORMAT;
-
 
     public PackDialog(MainFrame mainFrame, FileSet files) {
         super(mainFrame, files, ActionProperties.getActionLabel(PackAction.Descriptor.ACTION_ID), Translator.get("pack_dialog_description"), Translator.get("pack"), Translator.get("pack_dialog.error_title"), false);
@@ -95,11 +106,44 @@ public class PackDialog extends TransferDestinationDialog implements ItemListene
 		
         formatsComboBox.addItemListener(this);
         tempPanel.add(formatsComboBox);
-
+        
+        JPanel ignorePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        ignorePanel.add(new JLabel(Translator.get("pack_dialog.ignore_parent_folder")));
+        this.ignoreParentFolderBox = new JCheckBox();
+        ignoreParentFolderBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				ignoreParentFolderBox.requestFocus();
+				ignoreParentFolder = ignoreParentFolderBox.isSelected();
+			}
+        	
+        });
+        ignorePanel.add(ignoreParentFolderBox);
+        
+        JPanel packIntoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        packIntoPanel.add(new JLabel(Translator.get("pack_dialog.pack_into_selected_folder")));
+        this.packIntoSelectedFolderBox = new JCheckBox();
+        if (nbFiles > 1 || (nbFiles == 1 && !files.get(0).isDirectory())) {
+        	packIntoSelectedFolderBox.setEnabled(false);
+        	packIntoSelectedFolderBox.setSelected(false);
+        	ignoreParentFolderBox.setEnabled(false);
+        	ignoreParentFolderBox.setSelected(false);
+        }
+        packIntoSelectedFolderBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				handlePackIntoCurrentFolder(packIntoSelectedFolderBox.isSelected());
+			}
+        	
+        });
+        packIntoPanel.add(packIntoSelectedFolderBox);
+        
         YBoxPanel mainPanel = getMainPanel();
         mainPanel.add(tempPanel);		
+        mainPanel.add(ignorePanel);
+        mainPanel.add(packIntoPanel);        
         mainPanel.addSpace(10);
-		
+        
         // Comment area, enabled only if selected archive format has comment support
 		
         mainPanel.add(new JLabel(Translator.get("comment")));
@@ -115,7 +159,7 @@ public class PackDialog extends TransferDestinationDialog implements ItemListene
 
     @Override
     protected PathFieldContent computeInitialPath(FileSet files) {
-        String initialPath = mainFrame.getInactivePanel().getCurrentFolder().getAbsolutePath(true);
+        String initialPath = mainFrame.getActivePanel().getCurrentFolder().getAbsolutePath(true);
         AbstractFile file;
         String fileName;
         // Computes the archive's default name:
@@ -131,7 +175,7 @@ public class PackDialog extends TransferDestinationDialog implements ItemListene
             file = files.getBaseFolder();
             fileName = file.isRoot()?"":DesktopManager.isApplication(file)?file.getNameWithoutExtension():file.getName();
         }
-
+        
         return new PathFieldContent(initialPath + fileName + "." + Archiver.getFormatExtension(lastFormat), initialPath.length(), initialPath.length() + fileName.length());
     }
 
@@ -139,10 +183,27 @@ public class PackDialog extends TransferDestinationDialog implements ItemListene
     protected TransferFileJob createTransferFileJob(ProgressDialog progressDialog, PathUtils.ResolvedDestination resolvedDest, int defaultFileExistsAction) {
         // Remember last format used, for next time this dialog is invoked
         lastFormat = formats[formatsComboBox.getSelectedIndex()];
-
-        return new ArchiveJob(progressDialog, mainFrame, files, resolvedDest.getDestinationFile(), lastFormat, Archiver.formatSupportsComment(lastFormat)?commentArea.getText():null);
+        FileSet theFiles = handleSubFiles(files);
+        setFiles(theFiles);
+        return new ArchiveJob(progressDialog, mainFrame, theFiles, resolvedDest.getDestinationFile(), lastFormat, Archiver.formatSupportsComment(lastFormat)?commentArea.getText():null);
     }
-
+    /**
+     * If the ignore parent folder, we should retrieve all the sub files
+     */
+    private FileSet handleSubFiles(FileSet files) {
+    	try {
+    		if (ignoreParentFolder && files.size() == 1) {
+            	AbstractFile folder = files.get(0);
+            	FileSet newFiles = new FileSet(folder);
+            	AbstractFile[] subFiles = folder.ls();
+            	newFiles.addAll(subFiles);
+            	return newFiles;
+            }
+    	} catch(Exception e) {
+    		
+    	}
+    	return files;
+    }
     @Override
     protected String getProgressDialogTitle() {
         return Translator.get("pack_dialog.packing");
@@ -162,6 +223,18 @@ public class PackDialog extends TransferDestinationDialog implements ItemListene
         return destType==PathUtils.ResolvedDestination.NEW_FILE || destType==PathUtils.ResolvedDestination.EXISTING_FILE;
     }
 
+    private void handlePackIntoCurrentFolder(boolean isPackIntoSelectedFolder) {
+        if (files.size() == 1 && files.get(0).isDirectory()) {
+        	String fileName = files.get(0).getName();
+        	String initialPath = mainFrame.getActivePanel().getCurrentFolder().getAbsolutePath(true);
+        	if (isPackIntoSelectedFolder) {
+                initialPath = initialPath + fileName + File.separator;
+        	}
+        	FilePathField pathField = getPathField();
+        	pathField.setText(initialPath + fileName + "." + Archiver.getFormatExtension(lastFormat));
+        	packIntoSelectedFolderBox.requestFocus();
+        }
+    }
 
     //////////////////////////
     // ItemListener methods //
@@ -205,5 +278,7 @@ public class PackDialog extends TransferDestinationDialog implements ItemListene
 
         // Transfer focus back to the text field 
         pathField.requestFocus();
+
+        
     }
 }

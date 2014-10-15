@@ -178,7 +178,10 @@ public class FileDropTargetListener implements DropTargetListener {
                         && (dragModifiers&MOVE_ACTION_MODIFIERS_EX)==0
                         && (event.getSourceActions()&DnDConstants.ACTION_COPY)!=0) {
                     LOGGER.debug("changing default action, was: DnDConstants.ACTION_MOVE, now: DnDConstants.ACTION_COPY");
-                    currentDropAction = DnDConstants.ACTION_COPY;
+                    
+                    //the default action is move
+                    
+                    currentDropAction = DnDConstants.ACTION_MOVE;
                 }
             }
         }

@@ -86,7 +86,12 @@ public abstract class TransferDestinationDialog extends JobDialog implements Act
     // Dialog size constraints
     protected final static Dimension MINIMUM_DIALOG_DIMENSION = new Dimension(360,0);
     // Dialog width should not exceed 360, height is not an issue (always the same)
-    protected final static Dimension MAXIMUM_DIALOG_DIMENSION = new Dimension(400,10000);	
+    protected final static Dimension MAXIMUM_DIALOG_DIMENSION = new Dimension(400,10000);
+
+    /**
+     * Check if it is needed to current path.
+     */
+    private boolean isPackIntoCurrentPath = true;
 
 	
     private final static int DEFAULT_ACTIONS[] = {
@@ -106,9 +111,11 @@ public abstract class TransferDestinationDialog extends JobDialog implements Act
         FileCollisionDialog.RESUME_TEXT,
         FileCollisionDialog.RENAME_TEXT
     };
-
-
     public TransferDestinationDialog(MainFrame mainFrame, FileSet files, String title, String labelText, String okText, String errorDialogTitle, boolean enableTransferOptions) {
+    	this(mainFrame, files, title, labelText, okText, errorDialogTitle, enableTransferOptions, false);
+    }
+
+    public TransferDestinationDialog(MainFrame mainFrame, FileSet files, String title, String labelText, String okText, String errorDialogTitle, boolean enableTransferOptions, boolean isPackIntoCurrentPath) {
         super(mainFrame, title, files);
 
         this.errorDialogTitle = errorDialogTitle;
@@ -190,6 +197,7 @@ public abstract class TransferDestinationDialog extends JobDialog implements Act
         });
     }
 
+    
     /**
      * Returns the main panel that contains the path field.
      *
@@ -208,6 +216,7 @@ public abstract class TransferDestinationDialog extends JobDialog implements Act
         return pathField;
     }
 
+    
     /**
      * Interrupts any ongoing thread and starts the given one. The spinning dial is set to 'animated'.
      *

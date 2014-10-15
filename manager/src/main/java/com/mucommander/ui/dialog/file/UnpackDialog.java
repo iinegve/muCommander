@@ -58,7 +58,8 @@ public class UnpackDialog extends TransferDestinationDialog {
 
     @Override
     protected PathFieldContent computeInitialPath(FileSet files) {
-        return new PathFieldContent(mainFrame.getInactivePanel().getCurrentFolder().getAbsolutePath(true));
+    	//The default unpack path should be current folder
+        return new PathFieldContent(mainFrame.getActivePanel().getCurrentFolder().getAbsolutePath(true));
     }
 
     @Override

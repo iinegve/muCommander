@@ -26,6 +26,10 @@ import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mucommander.conf.MuConfigurations;
+import com.mucommander.conf.MuPreference;
+import com.mucommander.conf.MuPreferences;
+
 /**
  * This class contains 'quick search' common functionality - selection of rows that match
  * the user's keyboard input.
@@ -48,7 +52,7 @@ public abstract class QuickSearch<T> extends KeyAdapter implements Runnable {
     private Thread timeoutThread;
 
 	/** Quick search timeout in ms */
-    private final static int QUICK_SEARCH_TIMEOUT = 2000;
+    private final static int QUICK_SEARCH_TIMEOUT = 1200;
 
     /** Icon that is used to indicate in the status bar that quick search has failed */
     protected final static String QUICK_SEARCH_KO_ICON = "quick_search_ko.png";
@@ -222,8 +226,10 @@ public abstract class QuickSearch<T> extends KeyAdapter implements Runnable {
             if(itemLen<searchStringLen)
                 continue;
 
+            boolean isCaseInsensitive = MuConfigurations.getPreferences().getVariable(MuPreference.CASE_INSENSITIVE_QSEARCH, MuPreferences.DEFAULT_CASE_INSENSITIVE_QSEARCH);
+            
             // Compare quick search string against
-            if (item.startsWith(searchString)) {
+            if ((isCaseInsensitive && item.toLowerCase().startsWith(searchString.toLowerCase())) || item.startsWith(searchString)) {
                 // We've got the best match we could ever have, let's get out of this loop!
                 startsWithCaseMatch = i;
                 break;
